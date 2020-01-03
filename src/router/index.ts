@@ -1,10 +1,11 @@
 import Vue from 'vue';
-import VueRouter from 'vue-router';
+import VueRouter, { RouteConfig } from 'vue-router';
 import Home from '../views/Home.vue';
-
+import store from '../util/store';
+import { getClient } from '../util/matrix';
 Vue.use(VueRouter);
 
-const routes = [
+const routes: RouteConfig[] = [
   {
     path: '/',
     name: 'home',
@@ -13,17 +14,37 @@ const routes = [
   {
     path: '/login',
     name: 'login',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    beforeEnter: (to, from, next) => {
+      if (store.accessToken) {
+        console.log("Already logged in, redirecting to /home");
+        next('/');
+      } else {
+        next();
+      }
+    },
     component: () => import(/* webpackChunkName: "about" */ '../views/Login.vue'),
   },
   {
+    path: '/logout',
+    name: 'logout',
+    beforeEnter: async (to, from, next) => {
+      console.log("Vaping login credentials");
+      try {
+        const client = getClient();
+        if (client) {
+          client.stopClient();
+          await client.logout();
+        }
+      } catch (ex) {
+        console.log("Failed to /logout", ex);
+      }
+      store.vapeLogin();
+      next('/login');
+    }
+  },
+  {
     path: '/slides/:roomId',
-    name: 'login',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    name: 'slides',
     component: () => import(/* webpackChunkName: "about" */ '../views/Slides.vue'),
   },
 ];

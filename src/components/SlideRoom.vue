@@ -9,7 +9,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component
-export default class HelloWorld extends Vue {
+export default class SlideRoom extends Vue {
   private slideNumber: number = 1;
   private totalSlides: number = 10;
   @Prop() private roomId!: string;

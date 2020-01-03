@@ -1,4 +1,7 @@
 declare module 'matrix-js-sdk' {
+
+    export function createClient(url: string|{accessToken: string, baseUrl: string, userId: string}): MatrixClient;
+
     export interface LoginData {
         identifier: {
           type: "m.id.user";
@@ -8,9 +11,17 @@ declare module 'matrix-js-sdk' {
         initial_device_display_name?: string;
     }
 
-    export class MatrixClient {
-        constructor(url: string);
+    export class MatrixClient{
         login(loginType: string, data: LoginData): Promise<{user_id: string, access_token: string, device_id: string}>;
+        logout(): Promise<void>;
+        getProfileInfo(userId: string): Promise<{displayname: string|null, avatar_url: string|null}|null>;
+        getOrCreateFilter(filterName: string, filter: Filter): Promise<string>;
+        stopClient(): void;
+        getRooms(): any[];
+        on(event: string, listener: (...params:[]) => any): MatrixClient;
+        on(event: "sync", listener: (state: string, prevState: string, data: any) => void): MatrixClient;
+        once(event: string, listener: (...params:[]) => any): MatrixClient;
+        removeListener(event: string, listener: any): MatrixClient;
     }
     export class AutoDiscovery {
         static findClientConfig(domain: string): Promise<DiscoveredClientConfig>;
@@ -66,5 +77,14 @@ declare module 'matrix-js-sdk' {
         ERROR_INVALID_IS = "Invalid identity server discovery response",
         ERROR_MISSING_WELLKNOWN = "No .well-known JSON file found",
         ERROR_INVALID_JSON = "Invalid JSON",
+    }
+
+    export class Filter {
+        constructor(userId: string, filterId: string);
+        setDefinition(def: any): void;
+    }
+
+    export class IndexedDBStore {
+        constructor();
     }
 }

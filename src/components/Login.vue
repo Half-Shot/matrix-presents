@@ -1,7 +1,10 @@
 <template>
   <div class="login-box">
     <h1>Login to Presents</h1>
-    <p v-if=(this.error) class="error-box">
+    <p v-if=loginInProgress class="info-box">
+      Logging in..
+    </p>
+    <p v-if=error class="error-box">
       <b> Error </b> {{ this.error }}
     </p>
     <form v-on:submit=this.onSubmit>
@@ -90,8 +93,9 @@ form {
 </style>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from "vue-property-decorator";
 import { discoverHomeserver, loginToMatrix } from "../util/matrix";
+import { AutoDiscoveryError } from 'matrix-js-sdk';
 
 @Component
 export default class Login extends Vue {
@@ -99,13 +103,48 @@ export default class Login extends Vue {
   private password: string = "";
   private error: string|null = null;
   private specifyHs: boolean = false;
+  private wellKnownError: string|null = null;
   private homeserver: string = "";
-  private homeserverInvalid: boolean = false;
-  private canLogin: boolean = false;
+  private loginInProgress: boolean = false;
+
+  private get canLogin() {
+    return this.validateForm().length === 0 && !this.loginInProgress;
+  }
+
+  private validateForm() {
+    const errors: string[] = [];
+    if (!this.username) {
+      errors.push("Username field is empty");
+    }
+
+    if (!this.password) {
+      errors.push("Password field is empty");
+    }
+
+    if (!this.homeserver) {
+      errors.push("Not homeserver given");
+    }
+
+    if (this.wellKnownError) {
+      errors.push(`Failed to discover homeserver (${this.wellKnownError}). Check homeserver configuration.`);
+    }
+
+    if (!this.homeserver) {
+      errors.push("Homeserver not given");
+    }
+    else if (!this.homeserver.startsWith("http")) {
+      errors.push("Homeserver does not start with http(s)://");
+    }
+
+
+    if (errors.length) {
+      console.log("Cannot login:", errors);
+    }
+
+    return errors;
+  }
 
   private async onUsernameChange(ev: Event) {
-    this.error = "";
-    this.updateCanLogin();
     if (this.username === "" || this.specifyHs) {
       return;
     }
@@ -114,40 +153,36 @@ export default class Login extends Vue {
     if (!domain || localpart[0] !== "@") {
       return; // Not a mxid
     }
+    this.wellKnownError = null;
     // Otherwise, attempt a well known request.
     const wellKnownResult = await discoverHomeserver(domain);
-    console.log(wellKnownResult);
     if (wellKnownResult.state === "SUCCESS") {
-      this.homeserver = wellKnownResult.base_url;
+      this.homeserver = wellKnownResult.url;
     } else if (wellKnownResult.state === "FAIL_ERROR" || wellKnownResult.state === "FAIL_PROMPT") {
-      this.error = `Failed to discover homeserver (${wellKnownResult.error}). Check homeserver configuration.`;
-      this.homeserver = "";
+      this.wellKnownError = wellKnownResult.error as AutoDiscoveryError;
     } else {
-      console.log("Unknown wellknown state:", wellKnownResult);
       // Not sure how to handle this.
+      console.log("Unknown wellknown state:", wellKnownResult);
     }
-    this.updateCanLogin();
   }
 
   private async onSubmit(ev: Event) {
     ev.preventDefault();
     try {
-      const loginRes = loginToMatrix(this.homeserver, this.username, this.password);
-      console.log(loginRes);
+      const loginRes = await loginToMatrix(this.homeserver, this.username, this.password);
+      this.$root.$data.sharedState.accessToken = loginRes.access_token;
+      this.$root.$data.sharedState.userId = loginRes.user_id;
+      this.$root.$data.sharedState.homeserver = this.homeserver;
+      this.$router.push("/");
     } catch (ex) {
+      this.error = `Failed to login: ${ex.message}`;
       console.error(ex);
     }
-    // Do a login attempt.
-  }
-
-  private updateCanLogin() {
-    this.canLogin = this.username.length > 0 && this.password.length > 0 && !this.homeserverInvalid && !!this.homeserver;
   }
 
   private async onToggleManualHs(ev: Event) {
     if (this.specifyHs) {
-      this.error = null;
-      this.updateCanLogin();
+      this.wellKnownError = null;
       return;
     }
     // Force re-evaluate.

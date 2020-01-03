@@ -9,9 +9,9 @@
 import SlideRoom from '@/components/SlideRoom.vue'
 
 export default {
-  name: 'home',
+  name: "slides",
   components: {
-    SlideRoom
-  }
+    SlideRoom,
+  },
 }
 </script>

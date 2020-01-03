@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@types/vue-router": "^2.0.0",
     "core-js": "^3.4.4",
     "matrix-js-sdk": "^2.4.6",
     "vue": "^2.6.10",
