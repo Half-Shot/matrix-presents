@@ -1,17 +1,17 @@
 <template>
   <div class="slide-wrapper">  
-    <SlideRoom :roomId=$route.params.roomId />
+    <Slide/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import SlideRoom from '@/components/SlideRoom.vue'
+import Slide from '@/components/Slide.vue'
 
 export default {
   name: "slides",
   components: {
-    SlideRoom,
+    Slide,
   },
 }
 </script>
