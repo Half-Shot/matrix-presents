@@ -1,18 +1,37 @@
 <template>
-  <div class="hello">
-    <h1>Slide #{{ slideNumber }} of #{{ totalSlides }}</h1>
-
+  <div class="slide-wrapper">
+    <strong v-if="error">{{ error }}. This room cannot be viewed.</strong>
+    <Slide v-else :eventId="slideEventId" :room="room"/>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from "vue-property-decorator";
+import { Room } from "matrix-js-sdk";
+import Slide from "./Slide.vue";
 
 @Component
 export default class SlideRoom extends Vue {
-  private slideNumber: number = 1;
-  private totalSlides: number = 10;
-  @Prop() private roomId!: string;
+  private slideEventId: string|null = null;
+  private slideEvents: string[];
+  private error: string = "";
+  @Prop() private room!: Room;
+
+  private beforeMount() {
+    const state = this.room.getLiveTimeline().getState("f");
+    const t = state.getStateEvents("uk.half-shot.presents.slides", "");
+    if (t === null) {
+      this.error = "The required state for this room was not found";
+      return;
+    }
+    const content = t.getContent();
+    this.slideEvents = content.slides;
+    this.slideEventId = content.slides[0];
+    if (this.slideEvents === undefined || this.slideEvents.length === 0) {
+      this.error = "No slides were given in the event.";
+      return;
+    }
+  }
 }
 </script>
 

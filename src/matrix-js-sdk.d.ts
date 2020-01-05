@@ -17,7 +17,8 @@ declare module 'matrix-js-sdk' {
         getProfileInfo(userId: string): Promise<{displayname: string|null, avatar_url: string|null}|null>;
         getOrCreateFilter(filterName: string, filter: Filter): Promise<string>;
         stopClient(): void;
-        getRooms(): any[];
+        getRooms(): Room[];
+        getRoom(roomId: string): Room;
         on(event: string, listener: (...params:[]) => any): MatrixClient;
         on(event: "sync", listener: (state: string, prevState: string, data: any) => void): MatrixClient;
         once(event: string, listener: (...params:[]) => any): MatrixClient;
@@ -86,5 +87,10 @@ declare module 'matrix-js-sdk' {
 
     export class IndexedDBStore {
         constructor();
+    }
+
+    export class Room {
+        findEventById(eventId: string): string;
+        getLiveTimeline(): any;
     }
 }

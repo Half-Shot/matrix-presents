@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="rainbow">
+  <div id="app">
     <div id="nav">
       <template v-if=(this.$root.$data.sharedState.userId)>
         Logged in as {{ this.$root.$data.sharedState.displayName }} |
@@ -9,7 +9,9 @@
       </template>
       <router-link v-if=(!this.$root.$data.sharedState.userId) to="/login">Login</router-link> |
     </div>
-    <router-view/>
+    <div class="content-wrapper">
+      <router-view/>
+    </div>
 
     <div v-if="showSettings" id="settings-modal">
       <SettingsModal :closeFn="() => showSettings = false"></SettingsModal>
@@ -17,7 +19,7 @@
   </div>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 @keyframes rainbow {
  0% {
   color: rgb(255, 0, 0);
@@ -31,6 +33,10 @@
  100% {
   color: rgb(255, 0, 0);
  }
+}
+
+.content-wrapper {
+  float: left;
 }
 
 .rainbow {

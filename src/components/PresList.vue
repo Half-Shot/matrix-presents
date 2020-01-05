@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from "vue-property-decorator";
 import { getClient } from "@/util/matrix";
 
 const STATE_KEY = "uk.half-shot.presents.slides";
@@ -30,7 +30,7 @@ export default class PresList extends Vue {
         //         PresCard,
         //     }
         // })
-        super()
+        super();
     }
 
     public beforeDestroy() {
@@ -39,7 +39,7 @@ export default class PresList extends Vue {
     }
 
     public beforeMount() {
-        console.log("beforeMount PresList")
+        console.log("beforeMount PresList");
         const client = getClient();
         client.on("sync", this.onSync.bind(this));
     }

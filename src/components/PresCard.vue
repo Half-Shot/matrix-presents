@@ -13,12 +13,12 @@
 </style>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class PresCard extends Vue {
   @Prop() private roomId!: string;
 }
 
-Vue.component('PresCard',PresCard);
+Vue.component("PresCard", PresCard);
 </script>
