@@ -23,6 +23,7 @@ declare module 'matrix-js-sdk' {
         on(event: "sync", listener: (state: string, prevState: string, data: any) => void): MatrixClient;
         once(event: string, listener: (...params:[]) => any): MatrixClient;
         removeListener(event: string, listener: any): MatrixClient;
+        getSyncState(): string|null;
     }
     export class AutoDiscovery {
         static findClientConfig(domain: string): Promise<DiscoveredClientConfig>;

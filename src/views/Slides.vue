@@ -26,6 +26,10 @@ export default {
   beforeMount: function() {
     const roomId = this.$route.params.roomId;
     const client = getClient();
+    if (client.getSyncState() !== null) {
+        this.room = client.getRoom(roomId);
+        return;
+    }
     const f = (newState: string) => {
       if (newState === "PREPARED") {
         this.syncing = false;
