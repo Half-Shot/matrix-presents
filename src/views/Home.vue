@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-    <h1> Home View </h1>
     <div class="home-grid">
       <section id="my-slides">
         <PresList/>
@@ -25,7 +24,6 @@
   grid-template-columns: 50%;
   grid-gap: 10px;
   grid-auto-rows: minmax(100px, auto);
-  width: 97vw;
   margin-left: 25px;
   margin-right: 25px;
 
@@ -66,6 +64,9 @@ export default {
   }),
   components: {
     PresList,
+  },
+  beforeMount: function() {
+    this.$root.$data.sharedState.pageName = "Home";
   }
 }
 </script>

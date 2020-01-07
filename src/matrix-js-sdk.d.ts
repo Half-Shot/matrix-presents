@@ -91,6 +91,7 @@ declare module 'matrix-js-sdk' {
     }
 
     export class Room {
+        public readonly name: string;
         findEventById(eventId: string): string;
         getLiveTimeline(): any;
     }

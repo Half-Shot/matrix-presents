@@ -13,7 +13,7 @@ import Slide from "./Slide.vue";
 @Component
 export default class SlideRoom extends Vue {
   private slideEventId: string|null = null;
-  private slideEvents: string[];
+  private slideEvents: string[] = [];
   private error: string = "";
   @Prop() private room!: Room;
 
@@ -28,7 +28,7 @@ export default class SlideRoom extends Vue {
     this.slideEvents = content.slides;
     this.slideEventId = content.slides[0];
     if (this.slideEvents === undefined || this.slideEvents.length === 0) {
-      this.error = "No slides were given in the event.";
+      this.error = "No slides have been created";
       return;
     }
   }
