@@ -1,12 +1,15 @@
 <template>
   <div class="slide-list">
-    <h2> Your Slides </h2>
+    <h2>Your Slides</h2>
     <ul>
         <li v-for="room in rooms" :key="room.roomId">
             <PresCard :roomId="room.roomId"/>
         </li>
         <p v-if=loading>
             Loading slides...
+        </p>
+        <p v-if=hasNoRooms>
+            You are not currently subscribed to any Slides.
         </p>
     </ul>
   </div>
@@ -22,6 +25,10 @@ const STATE_KEY = "uk.half-shot.presents.slides";
 export default class PresList extends Vue {
     private rooms: any[] = [];
     private loading: boolean = true;
+
+    private get hasNoRooms() {
+        return !this.loading && this.rooms.length === 0;
+    }
 
     constructor() {
         // super({
@@ -70,5 +77,11 @@ export default class PresList extends Vue {
 </script>
 
 <style scoped lang="scss">
+.button-set {
+    list-style: none;
+}
 
+.button-set button {
+    margin-bottom: 5px;
+}
 </style>

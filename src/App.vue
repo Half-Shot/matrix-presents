@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="rainbow">
+  <div id="app">
     <div id="nav">
       <template v-if=(this.$root.$data.sharedState.userId)>
         Logged in as {{ this.$root.$data.sharedState.displayName }} |
@@ -9,11 +9,10 @@
       </template>
       <router-link v-if=(!this.$root.$data.sharedState.userId) to="/login">Login</router-link> |
     </div>
-    <router-view/>
-
-    <div v-if="showSettings" id="settings-modal">
-      <SettingsModal :closeFn="() => showSettings = false"></SettingsModal>
+    <div class="router-wrapper">
+      <router-view/>
     </div>
+    <SettingsModal v-if="showSettings" id="settings-modal" :closeFn="() => showSettings = false"/>
   </div>
 </template>
 
@@ -58,7 +57,10 @@
       color: #42b983;
     }
   }
-  
+}
+
+.router-wrapper {
+  display: inline-block;
 }
 </style>
 
@@ -68,7 +70,7 @@ import SettingsModal from "@/components/SettingsModal";
 import { Filter, IndexedDBStore } from "matrix-js-sdk";
 
 export default {
-  name: 'app',
+  name: "app",
   data: () => ({
     showSettings: false,
   }),

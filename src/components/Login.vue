@@ -7,7 +7,7 @@
     <p v-if=error class="error-box">
       <b> Error </b> {{ this.error }}
     </p>
-    <form v-on:submit=this.onSubmit>
+    <form @submit=onSubmit>
       <div>
         <label for="username">
           Username
@@ -167,6 +167,8 @@ export default class Login extends Vue {
   }
 
   private async onSubmit(ev: Event) {
+    this.error = null;
+    this.loginInProgress = true;
     ev.preventDefault();
     try {
       const loginRes = await loginToMatrix(this.homeserver, this.username, this.password);
@@ -178,6 +180,7 @@ export default class Login extends Vue {
       this.error = `Failed to login: ${ex.message}`;
       console.error(ex);
     }
+    this.loginInProgress = false;
   }
 
   private async onToggleManualHs(ev: Event) {

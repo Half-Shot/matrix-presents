@@ -27,5 +27,5 @@ export function createGlobalClient() {
 }
 
 export function getClient() {
-    return matrixClient;
+    return matrixClient ? matrixClient : createGlobalClient();
 }
