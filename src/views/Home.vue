@@ -8,7 +8,7 @@
                 <button @click="showSubscribeModal = true"> Subscribe to Slideshow </button>
             </li>
             <li>
-                <button @click="showCreateModal = true"> Create Slideshow </button>
+                <button disabled="true" @click="showCreateModal = true"> Create Slideshow </button>
             </li>
         </ul>   
       </section>

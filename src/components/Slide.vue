@@ -6,8 +6,8 @@
                 <h2 v-if="slideEv.content.subtitle !== undefined">{{ slideEv.content.subtitle }}</h2>
             </header>
             <main>
-                <section v-for="columnId in columns" :key="columnId">
-                    <SlideFragment v-for="eventId of columns[columnId]" :key="eventId" :eventId="eventId" :room="room"/>
+                <section v-for="(column, index) in columns" :key="index">
+                    <SlideFragment v-for="eventId in column" :key="eventId" :eventId="eventId" :room="room"/>
                 </section>
             </main>
         </div>
@@ -49,6 +49,7 @@ header {
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import SlideFragment from "./SlideFragment.vue"
 
 const SLIDE_EVENT_TYPE = "uk.half-shot.presents.slide";
 

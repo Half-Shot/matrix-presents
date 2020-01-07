@@ -26,7 +26,7 @@ export default class SlideRoom extends Vue {
     }
     const content = t.getContent();
     this.slideEvents = content.slides;
-    this.slideEventId = content.slides[0];
+    this.slideEventId = content.slides[1];
     if (this.slideEvents === undefined || this.slideEvents.length === 0) {
       this.error = "No slides have been created";
       return;
