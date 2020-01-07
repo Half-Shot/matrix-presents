@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from "vue-property-decorator";
 import { getClient } from "@/util/matrix";
 
 const STATE_KEY = "uk.half-shot.presents.slides";
@@ -37,7 +37,7 @@ export default class PresList extends Vue {
         //         PresCard,
         //     }
         // })
-        super()
+        super();
     }
 
     public beforeDestroy() {
@@ -46,9 +46,12 @@ export default class PresList extends Vue {
     }
 
     public beforeMount() {
-        console.log("beforeMount PresList")
         const client = getClient();
-        client.on("sync", this.onSync.bind(this));
+        if (client.getSyncState() === null) {
+            client.on("sync", this.onSync.bind(this));
+        } else {
+            this.regenerateRoomList();
+        }
     }
 
     private regenerateRoomList() {
@@ -62,12 +65,10 @@ export default class PresList extends Vue {
             }
             this.rooms.push(room);
         });
-        console.log("Finished generating room list");
         this.loading = false;
     }
 
     private onSync(state: string, prevState: string, data: any) {
-        console.log("onSync", state, prevState, data);
         if (state === "PREPARED" && prevState === null) {
             this.regenerateRoomList();
         }

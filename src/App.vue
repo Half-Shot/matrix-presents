@@ -9,14 +9,18 @@
       </template>
       <router-link v-if=(!this.$root.$data.sharedState.userId) to="/login">Login</router-link> |
     </div>
-    <div class="router-wrapper">
+    <div class="content-wrapper">
       <router-view/>
+    </div>
+
+    <div v-if="showSettings" id="settings-modal">
+      <SettingsModal :closeFn="() => showSettings = false"></SettingsModal>
     </div>
     <SettingsModal v-if="showSettings" id="settings-modal" :closeFn="() => showSettings = false"/>
   </div>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 @keyframes rainbow {
  0% {
   color: rgb(255, 0, 0);
@@ -30,6 +34,10 @@
  100% {
   color: rgb(255, 0, 0);
  }
+}
+
+.content-wrapper {
+  float: left;
 }
 
 .rainbow {
