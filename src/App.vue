@@ -1,13 +1,18 @@
 <template>
   <div id="app">
     <div id="nav">
-      <template v-if=(this.$root.$data.sharedState.userId)>
-        Logged in as {{ this.$root.$data.sharedState.displayName }} |
-        <router-link to="/">My Slides</router-link> |
-        <a href="#" @click="showSettings = true">Settings</a> |
-        <router-link to="/logout">Logout</router-link>
-      </template>
-      <router-link v-if=(!this.$root.$data.sharedState.userId) to="/login">Login</router-link> |
+      <div id="status">
+        <h1 v-if="$root.$data.sharedState.pageName"> {{ $root.$data.sharedState.pageName }} </h1>
+      </div>
+      <div id="links">
+        <template v-if="$root.$data.sharedState.userId">
+          Logged in as {{ $root.$data.sharedState.displayName }} |
+          <router-link to="/">My Slides</router-link> |
+          <a href="#" @click="showSettings = true">Settings</a> |
+          <router-link to="/logout">Logout</router-link>
+        </template>
+        <router-link v-if=(!this.$root.$data.sharedState.userId) to="/login">Login</router-link>
+      </div>
     </div>
     <div class="content-wrapper">
       <router-view/>
@@ -37,7 +42,7 @@
 }
 
 .content-wrapper {
-  float: left;
+  margin: 30px 50px;
 }
 
 .rainbow {
@@ -55,14 +60,29 @@
 }
 
 #nav {
-  padding: 30px;
-  float:right;
+  padding: 3vh 2vw;
+  width: 96vw;
+  min-height: 7vh;
   a {
     font-weight: bold;
     color: #2c3e50;
 
     &.router-link-exact-active {
       color: #42b983;
+    }
+  }
+  #links {
+    width: 50%;
+    text-align: right;
+    float: right;
+  }
+  #status {
+    width: 50%;
+    text-align: left;
+    float: left;
+
+    h1 {
+      font-size: 18pt;
     }
   }
 }

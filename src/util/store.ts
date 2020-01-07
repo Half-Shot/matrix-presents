@@ -3,9 +3,16 @@ interface IState {
     displayName: string|null;
     accessToken?: string;
     homeserver?: string;
+    pageName: string|null;
 }
 
 class Store {
+
+    public state: IState = {
+        user_id: null,
+        displayName: null,
+        pageName: null,
+    };
 
     constructor() {
         // Read from storage
@@ -13,11 +20,6 @@ class Store {
         this.homeserver = localStorage.getItem("matrix-presents.homeserver") || undefined;
         this.accessToken = localStorage.getItem("matrix-presents.access_token") || undefined;
     }
-
-    public state: IState = {
-        user_id: null,
-        displayName: null,
-    };
 
     public get defaultHomeserver() {
         return 'https://matrix.org';
@@ -34,6 +36,14 @@ class Store {
         return this.state.user_id;
     }
 
+    public set pageName(name) {
+        this.state.pageName = name;
+    }
+
+    public get pageName(): string|null {
+        return this.state.pageName;
+    }
+ 
     public set displayName(displayName: string|null) {
         this.state.displayName = displayName;
     }
