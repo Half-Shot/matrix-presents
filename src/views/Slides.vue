@@ -32,27 +32,29 @@ export default {
   beforeMount: function() {
     const roomId = this.$route.params.roomId;
     const client = getClient();
+    const onSynced = () => {
+      this.syncing = false;
+      this.room = client.getRoom(roomId);
+      this.$root.$data.sharedState.pageName = this.room ? this.room.name : roomId;
+      console.log("Got room", this.room);
+
+      if (!this.room) {
+        // TODO: Lazy validation
+        this.validRoomId = (roomId.startsWith("!") || roomId.startsWith("#")) && roomId.includes(":");
+      }
+    };
+
     if (client.getSyncState() !== null) {
-        this.room = client.getRoom(roomId);
-        if (!this.room) {
-          // TODO: Lazy validation
-          this.validRoomId = (roomId.startsWith("!") || roomId.startsWith("#")) && roomId.includes(":");
-        }
+        onSynced();
         return;
     }
     const f = (newState: string) => {
       if (newState === "PREPARED") {
-        this.syncing = false;
-        this.room = client.getRoom(roomId);
-        console.log("Got room", this.room);
+        onSynced();
         client.removeListener("sync", f);
-        if (!this.room) {
-          // TODO: Lazy validation
-          this.validRoomId = (roomId.startsWith("!") || roomId.startsWith("#")) && roomId.includes(":");
-        }
       }
     };
     client.on("sync", f);
-  },
+  }
 }
 </script>
