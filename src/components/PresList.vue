@@ -3,7 +3,9 @@
     <h2>Your Slides</h2>
     <ul>
         <li v-for="room in rooms" :key="room.roomId">
-            <PresCard :roomId="room.roomId"/>
+            <div class="card">
+                <a :href="`/slides/${encodeURIComponent(room.roomId)}`">{{ room.name }}</a>
+            </div>
         </li>
         <p v-if=loading>
             Loading slides...
@@ -18,6 +20,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { getClient } from "@/util/matrix";
+import PresCard from "./PresCard.vue";
 
 const STATE_KEY = "uk.half-shot.presents.slides";
 
@@ -37,7 +40,7 @@ export default class PresList extends Vue {
         //         PresCard,
         //     }
         // })
-        super();
+        super()
     }
 
     public beforeDestroy() {
@@ -46,12 +49,13 @@ export default class PresList extends Vue {
     }
 
     public beforeMount() {
+        console.log("beforeMount PresList")
         const client = getClient();
-        if (client.getSyncState() === null) {
-            client.on("sync", this.onSync.bind(this));
-        } else {
+        if (client.getSyncState() !== null) {
             this.regenerateRoomList();
+            return;
         }
+        client.on("sync", this.onSync.bind(this));
     }
 
     private regenerateRoomList() {
@@ -65,10 +69,12 @@ export default class PresList extends Vue {
             }
             this.rooms.push(room);
         });
+        console.log("Finished generating room list");
         this.loading = false;
     }
 
     private onSync(state: string, prevState: string, data: any) {
+        console.log("onSync", state, prevState, data);
         if (state === "PREPARED" && prevState === null) {
             this.regenerateRoomList();
         }
@@ -78,11 +84,10 @@ export default class PresList extends Vue {
 </script>
 
 <style scoped lang="scss">
-.button-set {
+ul {
     list-style: none;
 }
+.card {
 
-.button-set button {
-    margin-bottom: 5px;
 }
 </style>
