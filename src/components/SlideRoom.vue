@@ -1,7 +1,8 @@
 <template>
-  <div class="slide-wrapper">
+  <div class="slide-wrapper" @click="advanceSlide">
     <strong v-if="error">{{ error }}. This room cannot be viewed.</strong>
-    <Slide v-else :eventId="slideEventId" :room="room"/>
+    <Slide v-else :eventId="slideEventId" :key="slideEventId" :room="room"/>
+    <strong>{{ slideEventIndex + 1 }} / {{ slideEvents.length }}</strong>
   </div>
 </template>
 
@@ -12,9 +13,9 @@ import Slide from "./Slide.vue";
 
 @Component
 export default class SlideRoom extends Vue {
-  private slideEventId: string|null = null;
+  private slideEventIndex: number = 0;
   private slideEvents: string[] = [];
-  private error: string = "";
+  private error: string|null = null;
   @Prop() private room!: Room;
 
   private beforeMount() {
@@ -26,11 +27,22 @@ export default class SlideRoom extends Vue {
     }
     const content = t.getContent();
     this.slideEvents = content.slides;
-    this.slideEventId = content.slides[1];
     if (this.slideEvents === undefined || this.slideEvents.length === 0) {
       this.error = "No slides have been created";
       return;
     }
+  }
+
+  private advanceSlide() {
+    if (this.slideEvents.length - 1 === this.slideEventIndex) {
+      return; // Cannot advance
+    }
+    this.slideEventIndex += 1;
+    console.log(`Advancing slide to ${this.slideEventIndex} ${this.slideEventId}`);
+  }
+
+  private get slideEventId() {
+    return this.slideEvents[this.slideEventIndex] || null;
   }
 }
 </script>

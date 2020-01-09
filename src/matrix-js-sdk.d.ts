@@ -24,6 +24,8 @@ declare module 'matrix-js-sdk' {
         once(event: string, listener: (...params:[]) => any): MatrixClient;
         removeListener(event: string, listener: any): MatrixClient;
         getSyncState(): string|null;
+        getHomeserverUrl(): string;
+        mxcUrlToHttp(url: string): string;
     }
     export class AutoDiscovery {
         static findClientConfig(domain: string): Promise<DiscoveredClientConfig>;
@@ -90,9 +92,16 @@ declare module 'matrix-js-sdk' {
         constructor();
     }
 
+    export class RoomMember {
+        public readonly rawDisplayName: string;
+        public getAvatarUrl(baseUrl: string, width: number, height: number, resizeMethod: "crop"|"scale"): string;
+    }
+
     export class Room {
         public readonly name: string;
+        public readonly _client: MatrixClient;
         findEventById(eventId: string): string;
         getLiveTimeline(): any;
+        getMember(userId: string): RoomMember;
     }
 }

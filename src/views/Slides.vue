@@ -13,23 +13,27 @@
 
 <script lang="ts">
 // @ is an alias to /src
+import SlideFragment from '@/components/SlideFragment.vue'
 import SlideRoom from '@/components/SlideRoom.vue'
 import Slide from '@/components/Slide.vue'
+
 import { getClient } from "../util/matrix";
 import { Room } from "matrix-js-sdk";
+import Component from 'vue-class-component'
+import Vue from 'vue';
 
-export default {
-  name: "slides",
+@Component({
   components: {
     SlideRoom,
     Slide,
-  },
-  data: () => ({
-    room: null as Room|null,
-    validRoomId: true,
-    syncing: true,
-  }),
-  beforeMount: function() {
+    SlideFragment,
+  }
+})
+export default class Slides extends Vue {
+  private room: Room|null = null;
+  private validRoomId: boolean = true;
+  private syncing: boolean = true;
+  public beforeMount() {
     const roomId = this.$route.params.roomId;
     const client = getClient();
     const onSynced = () => {

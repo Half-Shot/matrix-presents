@@ -37,10 +37,12 @@ class Store {
     }
 
     public set pageName(name) {
+        document.title = this.state.pageName || "matrix-presents";
         this.state.pageName = name;
     }
 
     public get pageName(): string|null {
+        // TODO: maybe not a great place to hook it
         return this.state.pageName;
     }
  
