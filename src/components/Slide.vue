@@ -73,7 +73,12 @@ main {
 }
 
 .column {
-    flex-basis: 100%;
+    margin-left: 45px;
+    flex-basis: max-content;
+}
+
+.column:nth-child(1) {
+    margin-left: 0;
 }
 </style>
 

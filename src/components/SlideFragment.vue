@@ -39,10 +39,14 @@ console.log("Registered");
 Vue.component("SlideFragment", SlideFragment);
 </script>
 
-<style>
+<style lang="scss" scoped>
 
 p {
-    font-size: 24pt;
+    font-size: 22pt;
+}
+
+code {
+    font-size: 18pt;
 }
 
 </style>
