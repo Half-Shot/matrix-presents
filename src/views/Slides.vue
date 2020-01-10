@@ -16,6 +16,7 @@
 import SlideFragment from '@/components/SlideFragment.vue'
 import SlideRoom from '@/components/SlideRoom.vue'
 import Slide from '@/components/Slide.vue'
+import TableTennis from '@/components/TableTennis.vue'
 
 import { getClient } from "../util/matrix";
 import { Room } from "matrix-js-sdk";
@@ -27,6 +28,7 @@ import Vue from 'vue';
     SlideRoom,
     Slide,
     SlideFragment,
+    TableTennis,
   }
 })
 export default class Slides extends Vue {

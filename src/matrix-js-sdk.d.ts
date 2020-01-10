@@ -29,6 +29,7 @@ declare module 'matrix-js-sdk' {
         mxcUrlToHttp(url: string): string;
         sendStateEvent(roomId: string, eventType: string, content: any, stateKey: string|""): Promise<string>;
         getUserId(): string;
+        fetchRoomEvent(roomId: string, eventId: string): Promise<any>;
     }
     export class AutoDiscovery {
         static findClientConfig(domain: string): Promise<DiscoveredClientConfig>;
