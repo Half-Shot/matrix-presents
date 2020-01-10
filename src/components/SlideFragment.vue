@@ -1,7 +1,8 @@
 <template>
     <div class="fragment">
         <img v-if="!!image" :src="image" :title="!text"/>
-        <p v-else-if="!!text"> {{ text }} </p>
+        <p class="html" v-else-if="!!textHtml" v-html="textHtml"></p>
+        <p class="plain" v-else-if="!!text"> {{ text }} </p>
     </div>
 </template>
 
@@ -17,11 +18,15 @@ export default class SlideFragment extends Vue {
 
     private image: string|null = null;
     private text: string|null = null;
+    private textHtml: string|null = null;
 
     public async beforeMount() {
         const eventData = await this.event;
         if (eventData.content.msgtype === "m.image") {
             this.image = this.room._client.mxcUrlToHttp(eventData.content.url);
+        }
+        if (eventData.content.formatted_body) {
+            this.textHtml = eventData.content.formatted_body;
         }
         if (eventData.content.body) {
             this.text = eventData.content.body;
