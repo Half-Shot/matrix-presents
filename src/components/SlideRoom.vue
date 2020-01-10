@@ -40,6 +40,9 @@ export default class SlideRoom extends Vue {
   }
 
   private advanceSlide() {
+    if (this.mode === "viewer") {
+      return;
+    }
     if (this.slideEvents.length - 1 === this.slideEventIndex) {
       return; // Cannot advance
     }
@@ -58,6 +61,9 @@ export default class SlideRoom extends Vue {
   }
 
   private previousSlide() {
+    if (this.mode === "viewer") {
+      return;
+    }
     if (this.slideEventIndex < 1) {
       return; // Cannot advance
     }
