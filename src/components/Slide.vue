@@ -66,16 +66,9 @@ header {
 }
 
 .slide {
-<<<<<<< HEAD
     text-align: left;
     min-width: 90vw;
     min-height: 80vh;
-=======
-  text-align: left;
-  border: 1px solid #000;
-  min-width: 90vw;
-  min-height: 80vh;
->>>>>>> 070d4b724f33f54cedc37134923f83620b8eeb98
 }
 
 main {
@@ -86,16 +79,12 @@ main {
 }
 
 .column {
-<<<<<<< HEAD
     margin-left: 45px;
     flex-basis: max-content;
 }
 
 .column:nth-child(1) {
     margin-left: 0;
-=======
-  flex-basis: 100%;
->>>>>>> 070d4b724f33f54cedc37134923f83620b8eeb98
 }
 </style>
 
