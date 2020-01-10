@@ -1,24 +1,20 @@
 # matrix-presents
 
-## Project setup
-```
-yarn install
-```
+A presentation client that reads from a Matrix room and displays it as pretty slides!
 
-### Compiles and hot-reloads for development
+For help and support, visit [#presents:half-shot.uk](https://matrix.to/#/#presents:half-shot.uk)
+
+## Project setup
+
+To run the project:
+
 ```
+git clone https://github.com/Half-Shot/matrix-presents
+cd matrix-presents
+yarn
 yarn serve
 ```
 
-### Compiles and minifies for production
-```
-yarn build
-```
+## Docs
 
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+- (Very rough) [Slide Theory](docs/slide-theory.md)
