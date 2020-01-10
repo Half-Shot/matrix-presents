@@ -21,11 +21,14 @@ declare module 'matrix-js-sdk' {
         getRoom(roomId: string): Room;
         on(event: string, listener: (...params:[]) => any): MatrixClient;
         on(event: "sync", listener: (state: string, prevState: string, data: any) => void): MatrixClient;
+        on(event: "event", listener: (event: {event: any}) => void): MatrixClient;
         once(event: string, listener: (...params:[]) => any): MatrixClient;
         removeListener(event: string, listener: any): MatrixClient;
         getSyncState(): string|null;
         getHomeserverUrl(): string;
         mxcUrlToHttp(url: string): string;
+        sendStateEvent(roomId: string, eventType: string, content: any, stateKey: string|""): Promise<string>;
+        getUserId(): string;
     }
     export class AutoDiscovery {
         static findClientConfig(domain: string): Promise<DiscoveredClientConfig>;
@@ -98,6 +101,7 @@ declare module 'matrix-js-sdk' {
     }
 
     export class Room {
+        public readonly roomId: string;
         public readonly name: string;
         public readonly _client: MatrixClient;
         findEventById(eventId: string): string;

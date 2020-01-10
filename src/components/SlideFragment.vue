@@ -31,7 +31,6 @@ export default class SlideFragment extends Vue {
         if (eventData.content.body) {
             this.text = eventData.content.body;
         }
-        console.log("event", eventData);
     }
 }
 
