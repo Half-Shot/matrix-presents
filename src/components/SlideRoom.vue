@@ -1,6 +1,6 @@
 <template>
   <div class="slide-wrapper">
-    <strong class="mode" @click="switchMode"> Mode: {{ mode }} </strong>
+    <strong :title="MODE_TITLE[mode]" class="mode" @click="switchMode"> Mode: {{ mode }} </strong>
     <strong v-if="error">{{ error }}. This room cannot be viewed.</strong>
     <Slide v-else :eventId="slideEventId" :key="slideEventId" :room="room"/>
     <strong>{{ slideEventIndex + 1 }} / {{ slideEvents.length }}</strong>
@@ -8,6 +8,7 @@
 </template>
 
 <script lang="ts">
+
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { Room } from "matrix-js-sdk";
 import Slide from "./Slide.vue";
@@ -19,6 +20,12 @@ export default class SlideRoom extends Vue {
   private error: string|null = null;
   private mode: "presenter"|"viewer"|"unlocked" = "viewer";
   @Prop() private room!: Room;
+
+  private readonly MODE_TITLE = {
+    viewer: "Locked to the presenters view",
+    unlocked: "Unlocked to explore the presentation",
+    presenter: "Present to other people in viewer mode",
+  };
 
   private beforeMount() {
     const state = this.room.getLiveTimeline().getState("f");
