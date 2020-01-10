@@ -96,10 +96,15 @@ export default class SlideRoom extends Vue {
 
   private switchMode() {
     // Can this user be a presenter?
+    if (this.mode === "viewer") {
+      this.mode = "unlocked";
+      return;
+    }
     if (this.mode === "presenter") {
       this.mode = "viewer";
       return;
     }
+    // unlocked
     const state = this.room.getLiveTimeline().getState("f");
     const canMovePosition = state.maySendStateEvent(
       "uk.half-shot.presents.position", this.$root.$data.sharedState.userId,
@@ -107,7 +112,7 @@ export default class SlideRoom extends Vue {
     if (canMovePosition) {
       this.mode = "presenter";
     } else {
-      this.mode = "unlocked";
+      this.mode = "viewer";
     }
   }
 
