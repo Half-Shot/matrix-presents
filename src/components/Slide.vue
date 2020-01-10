@@ -22,8 +22,8 @@
 <style lang="scss" scoped>
 
 header.normal {
-    margin: 5px 0px;
-    margin-left: 5px;
+    margin-top: 3%;
+    margin-left: 5%;
 }
 
 header.title {
@@ -61,7 +61,6 @@ header {
 
 .slide {
     text-align: left;
-    border: 1px solid #000;
     min-width: 90vw;
     min-height: 80vh;
 }

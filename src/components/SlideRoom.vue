@@ -1,6 +1,9 @@
 <template>
-  <div class="slide-wrapper">
-    <strong :title="MODE_TITLE[mode]" class="mode" @click="switchMode"> Mode: {{ mode }} </strong>
+  <div class="slide-wrapper" ref="slide" >
+    <div class="tools">
+      <strong :title="MODE_TITLE[mode]" class="mode" @click="switchMode"> Mode: {{ mode }} </strong>
+      <a @click="goFullscreen">{{ isFullscreen ? "Exit" : "Go"  }} Fullscreen</a>
+    </div>
     <strong v-if="error">{{ error }}. This room cannot be viewed.</strong>
     <Slide v-else :eventId="slideEventId" :key="slideEventId" :room="room"/>
     <strong>{{ slideEventIndex + 1 }} / {{ slideEvents.length }}</strong>
@@ -20,6 +23,8 @@ export default class SlideRoom extends Vue {
   private error: string|null = null;
   private mode: "presenter"|"viewer"|"unlocked" = "viewer";
   @Prop() private room!: Room;
+
+  private isFullscreen: boolean = false;
 
   private readonly MODE_TITLE = {
     viewer: "Locked to the presenters view",
@@ -137,6 +142,16 @@ export default class SlideRoom extends Vue {
     this.slideEventIndex = this.slideEvents.indexOf(event.event.content.event_id);
   }
 
+  private async goFullscreen() {
+    if (this.isFullscreen) {
+      document.exitFullscreen();
+      this.isFullscreen = false;
+      return;
+    }
+    await (this.$refs.slide as Element).requestFullscreen();
+    this.isFullscreen = true;
+  }
+
   private beforeUnmount() {
     window.removeEventListener("keypress", this.onKeyPress);
   }
@@ -162,5 +177,9 @@ a {
 
 .mode {
   text-align: left;
+}
+
+.slide-wrapper {
+  background: white;
 }
 </style>
