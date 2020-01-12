@@ -6,6 +6,7 @@ steps:
     plugins:
       - docker#v3.5.0:
           image: "node:12"
+          propagate-uid-gid: true
 
   - wait 
 
@@ -16,4 +17,5 @@ steps:
     plugins:
       - docker#v3.5.0:
           image: "node:12"
+          propagate-uid-gid: true
 
