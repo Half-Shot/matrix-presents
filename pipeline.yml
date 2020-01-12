@@ -1,0 +1,19 @@
+steps:
+  - label: ':hammer: Build'
+    command:
+      - "yarn"
+      - "yarn build"
+    plugins:
+      - docker#v3.5.0:
+          image: "node:12"
+
+  - wait 
+
+  - label: ':eslint: Linting'
+    command:
+      - "yarn"
+      - "yarn lint"
+    plugins:
+      - docker#v3.5.0:
+          image: "node:12"
+
