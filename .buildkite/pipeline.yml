@@ -6,7 +6,7 @@ steps:
     plugins:
       - docker#v3.5.0:
           image: "node:12"
-          user: 18273
+          user: 993
 
   - label: ':eslint: Linting'
     command:
@@ -15,5 +15,5 @@ steps:
     plugins:
       - docker#v3.5.0:
           image: "node:12"
-          user: 18273
+          user: 993
 
