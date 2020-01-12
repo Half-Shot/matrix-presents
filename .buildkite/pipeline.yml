@@ -1,7 +1,7 @@
 steps:
   - label: ':hammer: Build'
     command:
-      - "yarn"
+      - "yarn install"
       - "yarn build"
     plugins:
       - docker#v3.5.0:
@@ -12,7 +12,7 @@ steps:
 
   - label: ':eslint: Linting'
     command:
-      - "yarn"
+      - "yarn install"
       - "yarn lint"
     plugins:
       - docker#v3.5.0:
