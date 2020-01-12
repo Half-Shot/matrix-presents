@@ -7,6 +7,7 @@ steps:
       - docker#v3.5.0:
           image: "node:12"
           propagate-uid-gid: true
+          workdir: /app
 
   - wait 
 
@@ -18,4 +19,5 @@ steps:
       - docker#v3.5.0:
           image: "node:12"
           propagate-uid-gid: true
+          workdir: /app
 
