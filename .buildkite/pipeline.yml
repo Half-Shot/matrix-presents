@@ -3,6 +3,7 @@ steps:
     command:
       - "yarn install"
       - "yarn build"
+      - "rm -R node_modules"
     plugins:
       - docker#v3.5.0:
           image: "node:12"
@@ -12,7 +13,6 @@ steps:
 
   - label: ':eslint: Linting'
     command:
-      - "yarn install"
       - "yarn lint"
     plugins:
       - docker#v3.5.0:
