@@ -6,6 +6,7 @@ steps:
     plugins:
       - docker#v3.5.0:
           image: "node:12"
+          user: buildkite-agent
 
   - label: ':eslint: Linting'
     command:
@@ -14,4 +15,5 @@ steps:
     plugins:
       - docker#v3.5.0:
           image: "node:12"
+          user: buildkite-agent
 
