@@ -1,14 +1,17 @@
 <template>
     <div class="fragment">
         <img v-if="!!image" :src="image" :title="!text"/>
-        <p class="html" v-else-if="!!textHtml" v-html="textHtml"></p>
+        <p ref=html class="html" v-else-if="!!textHtml" v-html="textHtml"></p>
         <p class="plain" v-else-if="!!text"> {{ text }} </p>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { Room } from 'matrix-js-sdk';
+import { Room } from "matrix-js-sdk";
+import hljs from "highlight.js";
+import "highlight.js/styles/github.css";
+
 
 @Component
 export default class SlideFragment extends Vue {
@@ -32,6 +35,14 @@ export default class SlideFragment extends Vue {
             this.text = eventData.content.body;
         }
     }
+
+    private updated() {
+        if (this.$refs.html) {
+            (this.$refs.html as Element).querySelectorAll("code").forEach((codeEl) => {
+                hljs.highlightBlock(codeEl);
+            });
+        }
+    }
 }
 
 console.log("Registered");
@@ -39,14 +50,15 @@ console.log("Registered");
 Vue.component("SlideFragment", SlideFragment);
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 
-p {
-    font-size: 22pt;
+p.plain {
+    font-size: 3vh;
 }
 
 code {
-    font-size: 18pt;
+    font-size: 2vh;
 }
+
 
 </style>
