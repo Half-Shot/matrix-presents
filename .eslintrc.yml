@@ -1,0 +1,29 @@
+
+root: true
+
+parser: 'vue-eslint-parser'
+
+env:
+  es6: true
+  node: true
+
+extends:
+  - plugin:vue/essential
+  - plugin:@typescript-eslint/eslint-recommended
+  - plugin:@typescript-eslint/recommended
+
+parserOptions:
+  parser: '@typescript-eslint/parser'
+  sourceType: module
+  extraFileExtensions: ['.vue', '.ts']
+  ecmaFeatures:
+    jsx: true
+
+plugins:
+# Local version of @typescript-eslint/eslint-plugin
+- '@typescript-eslint'
+
+rules:
+  '@typescript-eslint/no-explicit-any': 'error'
+  '@typescript-eslint/member-delimiter-style': 'off'
+  '@typescript-eslint/explicit-function-return-type': 'off'
