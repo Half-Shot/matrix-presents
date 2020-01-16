@@ -1,17 +1,19 @@
-interface IState {
-    user_id: string|null;
+interface State {
+    userId: string|null;
     displayName: string|null;
     accessToken?: string;
     homeserver?: string;
     pageName: string|null;
+    isGuest: boolean;
 }
 
 class Store {
 
-    public state: IState = {
-        user_id: null,
+    public state: State = {
+        userId: null,
         displayName: null,
         pageName: null,
+        isGuest: false,
     };
 
     constructor() {
@@ -19,21 +21,22 @@ class Store {
         this.userId = localStorage.getItem("matrix-presents.user_id");
         this.homeserver = localStorage.getItem("matrix-presents.homeserver") || undefined;
         this.accessToken = localStorage.getItem("matrix-presents.access_token") || undefined;
+        this.isGuest = localStorage.getItem("matrix-presents.is_guest") === "true" || false;
     }
 
-    public get defaultHomeserver() {
-        return 'https://matrix.org';
+    public get defaultHomeserver(): string {
+        return "https://matrix.org";
     }
 
     public set userId(userId: string|null) {
-        this.state.user_id = userId;
+        this.state.userId = userId;
         if (userId) {
             localStorage.setItem("matrix-presents.user_id", userId);
         }
     }
 
     public get userId(): string|null {
-        return this.state.user_id;
+        return this.state.userId;
     }
 
     public set pageName(name) {
@@ -45,7 +48,7 @@ class Store {
         // TODO: maybe not a great place to hook it
         return this.state.pageName;
     }
- 
+
     public set displayName(displayName: string|null) {
         this.state.displayName = displayName;
     }
@@ -61,7 +64,7 @@ class Store {
         }
     }
 
-    public get accessToken() {
+    public get accessToken(): string|undefined {
         return this.state.accessToken;
     }
 
@@ -72,11 +75,20 @@ class Store {
         }
     }
 
-    public get homeserver() {
+    public get homeserver(): string|undefined {
         return this.state.homeserver;
     }
 
-    public vapeLogin() {
+    public set isGuest(isGuest: boolean) {
+        this.state.isGuest = isGuest;
+        localStorage.setItem("matrix-presents.is_guest", isGuest.toString());
+    }
+
+    public get isGuest(): boolean {
+        return this.state.isGuest;
+    }
+
+    public vapeLogin(): void {
         localStorage.removeItem("matrix-presents.access_token");
         localStorage.removeItem("matrix-presents.user_id");
         localStorage.removeItem("matrix-presents.homeserver");

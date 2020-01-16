@@ -14,11 +14,25 @@ export async function loginToMatrix(homeserver: string, username: string, passwo
             user: username,
         },
         password,
-    })
+    });
+}
+
+export async function registerGuestIfNotLoggedIn() {
+    // Create a guest{
+    if (Store.accessToken) {
+        return;
+    }
+    console.log("Creating a guest account");
+    const baseUrl = Store.homeserver || Store.defaultHomeserver;
+    const res = await createClient({
+        baseUrl,
+    }).registerGuest();
+    Store.accessToken = res.access_token;
+    Store.userId = res.user_id;
+    Store.homeserver = baseUrl;
 }
 
 export function createGlobalClient() {
-    // TODO: Guard this.
     return matrixClient = createClient({
         baseUrl: Store.homeserver!,
         accessToken: Store.accessToken!,

@@ -94,8 +94,8 @@ form {
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { discoverHomeserver, loginToMatrix } from "../util/matrix";
-import { AutoDiscoveryError } from 'matrix-js-sdk';
+import { discoverHomeserver, loginToMatrix, getClient } from "../util/matrix";
+import { AutoDiscoveryError } from "matrix-js-sdk";
 
 @Component
 export default class Login extends Vue {
@@ -131,8 +131,7 @@ export default class Login extends Vue {
 
     if (!this.homeserver) {
       errors.push("Homeserver not given");
-    }
-    else if (!this.homeserver.startsWith("http")) {
+    } else if (!this.homeserver.startsWith("http")) {
       errors.push("Homeserver does not start with http(s)://");
     }
 
@@ -172,6 +171,13 @@ export default class Login extends Vue {
     ev.preventDefault();
     try {
       const loginRes = await loginToMatrix(this.homeserver, this.username, this.password);
+      const existingClient = getClient();
+      if (existingClient) {
+        existingClient.stopClient();
+        await existingClient.store.deleteAllData();
+        await existingClient.logout();
+        console.log("Destroyed existing client");
+      }
       this.$root.$data.sharedState.accessToken = loginRes.access_token;
       this.$root.$data.sharedState.userId = loginRes.user_id;
       this.$root.$data.sharedState.homeserver = this.homeserver;
@@ -192,7 +198,4 @@ export default class Login extends Vue {
     await this.onUsernameChange(ev);
   }
 }
-
-
-
 </script>

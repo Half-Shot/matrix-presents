@@ -1,51 +1,56 @@
-declare module 'matrix-js-sdk' {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+declare module "matrix-js-sdk" {
 
-    export function createClient(url: string|{accessToken: string, baseUrl: string, userId: string}): MatrixClient;
+    export function createClient(url: string|{accessToken?: string, baseUrl: string, userId?: string}): MatrixClient;
 
     export interface LoginData {
         identifier: {
           type: "m.id.user";
           user: string;
-        },
+        };
         password: string;
         initial_device_display_name?: string;
     }
 
-    export class MatrixClient{
-        login(loginType: string, data: LoginData): Promise<{user_id: string, access_token: string, device_id: string}>;
-        logout(): Promise<void>;
-        getProfileInfo(userId: string): Promise<{displayname: string|null, avatar_url: string|null}|null>;
-        getOrCreateFilter(filterName: string, filter: Filter): Promise<string>;
-        stopClient(): void;
-        getRooms(): Room[];
-        getRoom(roomId: string): Room;
-        on(event: string, listener: (...params:[]) => any): MatrixClient;
-        on(event: "sync", listener: (state: string, prevState: string, data: any) => void): MatrixClient;
-        on(event: "event", listener: (event: {event: any}) => void): MatrixClient;
-        once(event: string, listener: (...params:[]) => any): MatrixClient;
-        removeListener(event: string, listener: any): MatrixClient;
-        getSyncState(): string|null;
-        getHomeserverUrl(): string;
-        mxcUrlToHttp(url: string): string;
-        sendStateEvent(roomId: string, eventType: string, content: any, stateKey: string|""): Promise<string>;
-        getUserId(): string;
-        fetchRoomEvent(roomId: string, eventId: string): Promise<any>;
+    export class MatrixClient {
+        public store: {
+            deleteAllData(): Promise<void>;
+        };
+        public login(loginType: string, data: LoginData): Promise<{user_id: string, access_token: string, device_id: string}>;
+        public logout(): Promise<void>;
+        public getProfileInfo(userId: string): Promise<{displayname: string|null, avatar_url: string|null}|null>;
+        public getOrCreateFilter(filterName: string, filter: Filter): Promise<string>;
+        public stopClient(): void;
+        public getRooms(): Room[];
+        public getRoom(roomId: string): Room;
+        public on(event: string, listener: (...params: []) => any): MatrixClient;
+        public on(event: "sync", listener: (state: string, prevState: string, data: any) => void): MatrixClient;
+        public on(event: "event", listener: (event: {event: any}) => void): MatrixClient;
+        public once(event: string, listener: (...params: []) => any): MatrixClient;
+        public removeListener(event: string, listener: any): MatrixClient;
+        public getSyncState(): string|null;
+        public getHomeserverUrl(): string;
+        public mxcUrlToHttp(url: string): string;
+        public sendStateEvent(roomId: string, eventType: string, content: any, stateKey: string|""): Promise<string>;
+        public getUserId(): string;
+        public fetchRoomEvent(roomId: string, eventId: string): Promise<any>;
+        public registerGuest(): Promise<any>;
     }
     export class AutoDiscovery {
-        static findClientConfig(domain: string): Promise<DiscoveredClientConfig>;
+        public static findClientConfig(domain: string): Promise<DiscoveredClientConfig>;
     }
 
     export class DiscoveredClientConfig {
-        constructor();
-        "m.homeserver": {
+        public "m.homeserver": {
             state: AutoDiscoveryState,
             error: AutoDiscoveryError|false,
             url: string,
         };
-        "m.identity_server": {
+        public "m.identity_server": {
             state: AutoDiscoveryState,
             url: string,
         };
+        constructor();
     }
 
     export enum AutoDiscoveryState {
@@ -72,7 +77,7 @@ declare module 'matrix-js-sdk' {
         /**
          * The auto discovery was successful.
          */
-        SUCCESS = "SUCCESS"
+        SUCCESS = "SUCCESS",
     }
 
     export enum AutoDiscoveryError {
@@ -89,7 +94,7 @@ declare module 'matrix-js-sdk' {
 
     export class Filter {
         constructor(userId: string, filterId: string);
-        setDefinition(def: any): void;
+        public setDefinition(def: any): void;
     }
 
     export class IndexedDBStore {
@@ -105,8 +110,8 @@ declare module 'matrix-js-sdk' {
         public readonly roomId: string;
         public readonly name: string;
         public readonly _client: MatrixClient;
-        findEventById(eventId: string): string;
-        getLiveTimeline(): any;
-        getMember(userId: string): RoomMember;
+        public findEventById(eventId: string): string;
+        public getLiveTimeline(): any;
+        public getMember(userId: string): RoomMember;
     }
 }
