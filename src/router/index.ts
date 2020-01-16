@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
-import Home from "../views/Home.vue";
+import Home from "../pages/Home.vue";
 import store from "../util/store";
 import { getClient } from "../util/matrix";
 Vue.use(VueRouter);
@@ -11,7 +11,7 @@ const routes: RouteConfig[] = [
     name: "home",
     component: Home,
     beforeEnter: (to, from, next) => {
-      if (store.accessToken) {
+      if (!store.isGuest) {
         next();
         return;
       }
@@ -24,7 +24,7 @@ const routes: RouteConfig[] = [
     path: "/login",
     name: "login",
     beforeEnter: (to, from, next) => {
-      if (!store.accessToken) {
+      if (store.isGuest) {
         next();
         return;
       }
@@ -32,7 +32,7 @@ const routes: RouteConfig[] = [
       next("/");
       return;
     },
-    component: () => import(/* webpackChunkName: "about" */ "../views/Login.vue"),
+    component: () => import("../pages/Login.vue"),
   },
   {
     path: "/logout",
@@ -50,12 +50,12 @@ const routes: RouteConfig[] = [
       }
       store.vapeLogin();
       next("/login");
-    }
+    },
   },
   {
-    path: "/slides/:roomId",
+    path: "/slides/:roomId/:eventId?",
     name: "slides",
-    component: () => import(/* webpackChunkName: "about" */ "../views/Slides.vue"),
+    component: () => import("../pages/Slides.vue"),
   },
 ];
 

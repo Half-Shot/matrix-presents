@@ -52,21 +52,27 @@
 }
 </style>
 
-<script>
-import PresList from "@/components/PresList";
-import SubscribeModal from "@/components/SubscribeModal";
+<script lang="ts">
+import PresList from "../components/PresList.vue";
+import SubscribeModal from "../components/SubscribeModal.vue";
 
-export default {
-  name: 'home',
-  data: () => ({
-    showSubscribeModal: false,
-    showCreateModal: false,
-  }),
+import Component from "vue-class-component";
+import Vue from "vue";
+
+@Component({
   components: {
     PresList,
+    SubscribeModal,
   },
-  beforeMount: function() {
+  name: "home",
+})
+export default class Slides extends Vue {
+  private showSubscribeModal = false;
+  private showCreateModal = false;
+
+  private beforeMount(): void {
     this.$root.$data.sharedState.pageName = "Home";
   }
 }
+
 </script>
