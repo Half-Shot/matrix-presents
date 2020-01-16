@@ -72,7 +72,8 @@ export default class App extends Vue {
 
   private async beforeMount() {
     console.log("App mounting!");
-    await registerGuestIfNotLoggedIn();
+    const suggestedHs = this.$route.query.guestHs;
+    await registerGuestIfNotLoggedIn(typeof(suggestedHs) === "string" ? suggestedHs : undefined);
     const userId = this.$root.$data.sharedState.userId;
     // We should set this somewhere else.
     const client = createGlobalClient();

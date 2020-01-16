@@ -181,6 +181,7 @@ export default class Login extends Vue {
       this.$root.$data.sharedState.accessToken = loginRes.access_token;
       this.$root.$data.sharedState.userId = loginRes.user_id;
       this.$root.$data.sharedState.homeserver = this.homeserver;
+      this.$root.$data.sharedState.isGuest = false;
       this.$router.push("/");
     } catch (ex) {
       this.error = `Failed to login: ${ex.message}`;

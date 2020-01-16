@@ -4,8 +4,8 @@
         <h1 v-if="pageName"> {{ pageName }} </h1>
       </div>
       <div id="links">
+        Logged in as {{ displayName }} |
         <template v-if=!isGuest>
-          Logged in as {{ displayName }} |
           <router-link to="/">My Slides</router-link> |
           <a href="#" @click="showSettings">Settings</a> |
           <router-link to="/logout">Logout</router-link>
@@ -60,7 +60,7 @@ export default class Login extends Vue {
     }
 
     public get displayName() {
-        return this.$root.$data.sharedState.displayName;
+        return this.isGuest ? "Guest" : this.$root.$data.sharedState.displayName;
     }
 
     public get pageName() {
