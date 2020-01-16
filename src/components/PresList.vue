@@ -7,9 +7,6 @@
                 <a :href="`/slides/${encodeURIComponent(room.roomId)}`">{{ room.name }}</a>
             </div>
         </li>
-        <p v-if=loading>
-            Loading slides...
-        </p>
         <p v-if=hasNoRooms>
             You are not currently subscribed to any Slides.
         </p>
@@ -18,19 +15,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
 import { getClient } from "@/util/matrix";
-import PresCard from "./PresCard.vue";
 
 const STATE_KEY = "uk.half-shot.presents.slides";
 
 @Component
 export default class PresList extends Vue {
     private rooms: any[] = [];
-    private loading: boolean = true;
 
     private get hasNoRooms() {
-        return !this.loading && this.rooms.length === 0;
+        return this.rooms.length === 0;
     }
 
     constructor() {
@@ -40,22 +35,12 @@ export default class PresList extends Vue {
         //         PresCard,
         //     }
         // })
-        super()
-    }
-
-    public beforeDestroy() {
-        const client = getClient();
-        client.removeListener("sync", this.onSync);
+        super();
     }
 
     public beforeMount() {
-        console.log("beforeMount PresList")
-        const client = getClient();
-        if (client.getSyncState() !== null) {
-            this.regenerateRoomList();
-            return;
-        }
-        client.on("sync", this.onSync.bind(this));
+        console.log("beforeMount PresList");
+        this.regenerateRoomList();
     }
 
     private regenerateRoomList() {
@@ -70,17 +55,8 @@ export default class PresList extends Vue {
             this.rooms.push(room);
         });
         console.log("Finished generating room list");
-        this.loading = false;
-    }
-
-    private onSync(state: string, prevState: string, data: any) {
-        console.log("onSync", state, prevState, data);
-        if (state === "PREPARED" && prevState === null) {
-            this.regenerateRoomList();
-        }
     }
 }
-
 </script>
 
 <style scoped lang="scss">
