@@ -1,7 +1,7 @@
 <template>
   <div class="slide">
-    <TableTennis v-if="isPong" :client="room._client"/>
-    <div v-else-if="slideEv">
+    <strong v-if=loading>Loading Slide</strong>
+    <template v-else>
       <header :class="headerClass">
         <h1 v-if="slideEv.content.title !== undefined">{{ slideEv.content.title }}</h1>
         <h2 v-if="slideEv.content.subtitle !== undefined">{{ slideEv.content.subtitle }}</h2>
@@ -21,20 +21,20 @@
           />
         </section>
       </main>
-    </div>
-    <strong v-else>Loading Slide</strong>
+    </template>
   </div>
 </template>
 
 <style lang="scss" scoped>
 header.normal {
-    margin-top: 3%;
+    margin-top: 30px;
     margin-left: 5%;
 }
 
 header.title {
   text-align: center;
-  margin-top: 15%;
+  position: relative;
+  top: 15vh;
   margin-left: 5px;
 
   h1 {
@@ -139,12 +139,12 @@ export default class Slide extends Vue {
   private beforeMount() {
     console.log(`Loading ${this.eventId}`);
     this.getEvent(this.eventId)
-      .then(ev => {
+      .then((ev) => {
         console.log(`Loaded event`);
         this.slideEv = ev;
         console.log(this.slideEv);
       })
-      .catch(ex => {
+      .catch((ex) => {
         console.error("Error fetching event for slide:", ex);
         // Show an error
       })
@@ -157,7 +157,7 @@ export default class Slide extends Vue {
     // First, try to get it from the room
     const ev = await this.room._client.fetchRoomEvent(
       this.room.roomId,
-      eventId
+      eventId,
     );
     return ev as SlideEvent;
   }

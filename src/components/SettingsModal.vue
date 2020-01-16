@@ -10,7 +10,7 @@ import Modal from "./Modal.vue";
 
 @Component
 export default class SettingsModal extends Modal {
-    
+
 }
 
 Vue.component("SettingsModal", SettingsModal);
