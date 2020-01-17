@@ -12,6 +12,11 @@
   </div>
 </template>
 
+<style lang="scss">
+// Globals
+@import './main.scss';
+</style>
+
 <style scoped lang="scss">
 @keyframes rainbow {
  0% {
@@ -54,7 +59,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { createGlobalClient, registerGuestIfNotLoggedIn } from "./util/matrix";
+import { createGlobalClient, registerGuestIfNotLoggedIn, getClient } from "./util/matrix";
 import { IndexedDBStore } from "matrix-js-sdk";
 import Sync from "./components/Sync.vue";
 import Nav from "./components/Nav.vue";
@@ -78,21 +83,14 @@ export default class App extends Vue {
     await registerGuestIfNotLoggedIn(typeof(suggestedHs) === "string" ? suggestedHs : undefined);
     // We should set this somewhere else.
     const client = createGlobalClient();
-    const store = new IndexedDBStore({
-      indexedDB,
-    });
-    await store.startup(); // load from indexed db
-    client.startClient({
-      store,
-      localStorage,
-    });
+    client.startClient();
     client.on("sync", this.onSync.bind(this));
   }
 
   private async onSync(state: string, prevState: string) {
       console.log(`Sync ${prevState}->${state}`);
-      if (state === "PREPARED" && prevState === null) {
-          const client = createGlobalClient();
+      if (state === "SYNCING" && !this.ready) {
+          const client = getClient();
           const profile = await client.getProfileInfo(this.$root.$data.sharedState.userId);
           this.$root.$data.sharedState.displayName = profile && profile.displayname ? profile.displayname : userId;
           this.ready = true;

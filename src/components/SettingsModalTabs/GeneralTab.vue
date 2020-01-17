@@ -12,10 +12,10 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
-export default class KeymappingsTab extends Vue {
+export default class GeneralTab extends Vue {
 
     //
 
-    private static readonly tabName = "Keymappings";
+    private static readonly tabName = "General";
 }
 </script>

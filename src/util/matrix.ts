@@ -1,7 +1,7 @@
-import { AutoDiscovery, createClient, MatrixClient } from "matrix-js-sdk";
+import { AutoDiscovery, createClient, MatrixClient, IndexedDBStore } from "matrix-js-sdk";
 import Store from "./store";
 
-let matrixClient: MatrixClient;
+let matrixClient: MatrixClient|undefined;
 
 export async function discoverHomeserver(domain: string) {
     return (await AutoDiscovery.findClientConfig(domain))["m.homeserver"];
@@ -34,17 +34,41 @@ export async function registerGuestIfNotLoggedIn(suggestedHs?: string) {
 }
 
 export function createGlobalClient() {
+    const store = new IndexedDBStore({
+        indexedDB,
+    });
+    store.startup();
     matrixClient = createClient({
         baseUrl: Store.homeserver!,
         accessToken: Store.accessToken!,
         userId: Store.userId!,
+        deviceId: Store.deviceId!,
+        store,
     });
     window.mxClient = matrixClient;
     matrixClient.setGuest(Store.isGuest);
-    console.log(Store.isGuest);
     return matrixClient;
 }
 
 export function getClient() {
     return matrixClient ? matrixClient : createGlobalClient();
+}
+
+
+export async function logoutClient() {
+    try {
+        Store.vapeLogin();
+        const existingClient = getClient();
+        if (existingClient) {
+            existingClient.stopClient();
+            await existingClient.store.deleteAllData();
+            await existingClient.logout().catch((ex) => {
+                console.log("Could not logout:", ex);
+            });
+            console.log("Destroyed existing client");
+        }
+    } catch (ex) {
+        console.log("Failed to /logout", ex);
+    }
+    matrixClient = undefined;
 }

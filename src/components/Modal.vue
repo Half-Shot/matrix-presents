@@ -22,6 +22,7 @@
         padding: 5px;
         width: 30px;
         margin-right: 20px;
+        background: $color-secondary-1-0;
     }
 
     h1 {
@@ -48,11 +49,12 @@
     height: 90vh;
     min-height: 600px;
     border: 1px solid black;
-    background: whitesmoke;
+    background: $color-secondary-1-0;
 
     .body {
         margin-left: 15px;
         text-align: left;
+        height: 90%;
     }
 }
 </style>

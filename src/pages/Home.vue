@@ -1,14 +1,21 @@
 <template>
   <div class="home">
     <div class="home-grid">
-      <section id="my-slides">
-        <PresList/>
+      <section>
+        <h2>Your Slides</h2>
+        <PresList :filterOwn="true"/>
+        <ul class="button-set">
+            <li>
+                <button disabled="true" @click="showCreateModal = true"> Create Slideshow </button>
+            </li>
+        </ul>   
+      </section>
+      <section>
+        <h2>Subscribed Slides</h2>
+        <PresList :filterOwn="false"/>
         <ul class="button-set">
             <li>
                 <button @click="showSubscribeModal = true"> Subscribe to Slideshow </button>
-            </li>
-            <li>
-                <button disabled="true" @click="showCreateModal = true"> Create Slideshow </button>
             </li>
         </ul>   
       </section>
@@ -21,11 +28,11 @@
 <style lang="scss" scoped>
 .home-grid {
   display: grid;
-  grid-template-columns: 50%;
-  grid-gap: 10px;
-  grid-auto-rows: minmax(100px, auto);
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(3,minmax(40px,auto));
   margin-left: 25px;
   margin-right: 25px;
+  width: 100%;
 
   section {
     /*border: 1px solid black;*/
@@ -33,14 +40,9 @@
   }
 }
 
-.home-grid > #my-slides {
+.home-grid:nth-child(0) {
   grid-column: 1;
-  grid-row: 1 / 5;
-}
-
-.home-grid > #something-else {
-  grid-column: 2;
-  grid-row: 1 / 5;
+  grid-column: 1 / auto;
 }
 
 .button-set {

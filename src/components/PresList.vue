@@ -1,6 +1,5 @@
 <template>
   <div class="slide-list">
-    <h2>Your Slides</h2>
     <ul>
         <li v-for="room in rooms" :key="room.roomId">
             <div class="card">
@@ -15,13 +14,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-property-decorator";
 import { getClient } from "@/util/matrix";
 
 const STATE_KEY = "uk.half-shot.presents.slides";
 
 @Component
 export default class PresList extends Vue {
+    @Prop() private filterOwn!: boolean;
     private rooms: any[] = [];
 
     private get hasNoRooms() {
@@ -29,12 +29,6 @@ export default class PresList extends Vue {
     }
 
     constructor() {
-        // super({
-        //     name: "PresList",
-        //     components: {
-        //         PresCard,
-        //     }
-        // })
         super();
     }
 
@@ -46,9 +40,11 @@ export default class PresList extends Vue {
     private regenerateRoomList() {
         const client = getClient();
         this.rooms = [];
+        console.log(client.getRooms());
         client.getRooms().forEach((room) => {
             const state = room.getLiveTimeline().getState("f");
             const t = state.getStateEvents(STATE_KEY, "");
+            console.log(t);
             if (!t) {
                 return;
             }

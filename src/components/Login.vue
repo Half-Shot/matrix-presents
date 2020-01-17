@@ -94,8 +94,9 @@ form {
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { discoverHomeserver, loginToMatrix, getClient } from "../util/matrix";
+import { discoverHomeserver, loginToMatrix, logoutClient } from "../util/matrix";
 import { AutoDiscoveryError } from "matrix-js-sdk";
+import store from '../util/store';
 
 @Component
 export default class Login extends Vue {
@@ -171,17 +172,13 @@ export default class Login extends Vue {
     ev.preventDefault();
     try {
       const loginRes = await loginToMatrix(this.homeserver, this.username, this.password);
-      const existingClient = getClient();
-      if (existingClient) {
-        existingClient.stopClient();
-        await existingClient.store.deleteAllData();
-        await existingClient.logout();
-        console.log("Destroyed existing client");
-      }
-      this.$root.$data.sharedState.accessToken = loginRes.access_token;
-      this.$root.$data.sharedState.userId = loginRes.user_id;
-      this.$root.$data.sharedState.homeserver = this.homeserver;
-      this.$root.$data.sharedState.isGuest = false;
+      // Success!
+      await logoutClient();
+      store.accessToken = loginRes.access_token;
+      store.userId = loginRes.user_id;
+      store.homeserver = this.homeserver;
+      store.deviceId = loginRes.device_id;
+      store.isGuest = false;
       this.$router.push("/");
     } catch (ex) {
       this.error = `Failed to login: ${ex.message}`;

@@ -54,7 +54,7 @@ export default class Slides extends Vue {
     const client = getClient();
     try {
       const res = await client.joinRoom(this.$route.params.roomId);
-      this.roomId = res.room_id;
+      this.roomId = res.room_id || this.$route.params.roomId;
       // XXX: Slightly evil
       await this.loadRoomInfo();
     } catch (ex) {

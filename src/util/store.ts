@@ -1,8 +1,9 @@
 interface State {
     userId: string|null;
-    displayName: string|null;
+    displayName?: string;
     accessToken?: string;
     homeserver?: string;
+    deviceId?: string;
     pageName: string|null;
     isGuest: boolean;
 }
@@ -11,16 +12,17 @@ class Store {
 
     public state: State = {
         userId: null,
-        displayName: null,
         pageName: null,
         isGuest: false,
     };
 
     constructor() {
         // Read from storage
+        this.displayName = sessionStorage.getItem("matrix-presents.displayname") || undefined;
         this.userId = localStorage.getItem("matrix-presents.user_id");
         this.homeserver = localStorage.getItem("matrix-presents.homeserver") || undefined;
         this.accessToken = localStorage.getItem("matrix-presents.access_token") || undefined;
+        this.deviceId = localStorage.getItem("matrix-presents.device_id") || undefined;
         this.isGuest = localStorage.getItem("matrix-presents.is_guest") === "true" || false;
     }
 
@@ -32,7 +34,9 @@ class Store {
         this.state.userId = userId;
         if (userId) {
             localStorage.setItem("matrix-presents.user_id", userId);
+            return;
         }
+        localStorage.removeItem("matrix-presents.user_id");
     }
 
     public get userId(): string|null {
@@ -49,11 +53,16 @@ class Store {
         return this.state.pageName;
     }
 
-    public set displayName(displayName: string|null) {
+    public set displayName(displayName: string|undefined) {
         this.state.displayName = displayName;
+        if (displayName) {
+            sessionStorage.setItem("matrix-presents.displayname", displayName);
+            return;
+        }
+        sessionStorage.removeItem("matrix-presents.displayname");
     }
 
-    public get displayName(): string|null {
+    public get displayName(): string|undefined {
         return this.state.displayName;
     }
 
@@ -61,18 +70,35 @@ class Store {
         this.state.accessToken = accessToken;
         if (accessToken) {
             localStorage.setItem("matrix-presents.access_token", accessToken);
+            return;
         }
+        localStorage.removeItem("matrix-presents.device_id");
     }
 
     public get accessToken(): string|undefined {
         return this.state.accessToken;
     }
 
+    public set deviceId(deviceId: string|undefined) {
+        this.state.deviceId = deviceId;
+        if (deviceId) {
+            localStorage.setItem("matrix-presents.device_id", deviceId);
+            return;
+        }
+        localStorage.removeItem("matrix-presents.device_id");
+    }
+
+    public get deviceId(): string|undefined {
+        return this.state.deviceId;
+    }
+
     public set homeserver(homeserver: string|undefined) {
         this.state.homeserver = homeserver;
         if (homeserver) {
             localStorage.setItem("matrix-presents.homeserver", homeserver);
+            return;
         }
+        localStorage.removeItem("matrix-presents.homeserver");
     }
 
     public get homeserver(): string|undefined {
@@ -89,12 +115,12 @@ class Store {
     }
 
     public vapeLogin(): void {
-        localStorage.removeItem("matrix-presents.access_token");
-        localStorage.removeItem("matrix-presents.user_id");
-        localStorage.removeItem("matrix-presents.homeserver");
         this.accessToken = undefined;
         this.userId = null;
         this.homeserver = undefined;
+        this.isGuest = true; // Sort of wrong.
+        this.deviceId = undefined;
+        this.displayName = undefined;
     }
 }
 
