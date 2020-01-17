@@ -2,7 +2,7 @@ import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import Home from "../pages/Home.vue";
 import store from "../util/store";
-import { getClient } from "../util/matrix";
+import { getClient, logoutClient } from "../util/matrix";
 Vue.use(VueRouter);
 
 const routes: RouteConfig[] = [
@@ -39,20 +39,7 @@ const routes: RouteConfig[] = [
     name: "logout",
     beforeEnter: async (to, from, next) => {
       console.log("Vaping login credentials");
-      try {
-        const existingClient = getClient();
-        if (existingClient) {
-          existingClient.stopClient();
-          await existingClient.store.deleteAllData();
-          await existingClient.logout().catch((ex) => {
-            console.log("Could not logout:", ex);
-          });
-          console.log("Destroyed existing client");
-        }
-      } catch (ex) {
-        console.log("Failed to /logout", ex);
-      }
-      store.vapeLogin();
+      await logoutClient();
       next("/login");
     },
   },

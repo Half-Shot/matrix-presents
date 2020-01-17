@@ -62,7 +62,7 @@ export async function logoutClient() {
         if (existingClient) {
             existingClient.stopClient();
             await existingClient.store.deleteAllData();
-            await existingClient.logout().catch((ex) => {
+            existingClient.logout().catch((ex) => {
                 console.log("Could not logout:", ex);
             });
             console.log("Destroyed existing client");
