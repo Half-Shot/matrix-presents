@@ -52,17 +52,19 @@
 </style>
 
 <script lang="ts">
+import Vue from "vue";
+import Component from "vue-class-component";
 import { createGlobalClient, registerGuestIfNotLoggedIn } from "./util/matrix";
 import { IndexedDBStore } from "matrix-js-sdk";
 import Sync from "./components/Sync.vue";
 import Nav from "./components/Nav.vue";
-import Component from "vue-class-component";
-import Vue from "vue";
+import SettingsModal from "./components/SettingsModal.vue";
 
 @Component({
   components: {
     Sync,
     Nav,
+    SettingsModal,
   },
   name: "app",
 })
@@ -74,11 +76,8 @@ export default class App extends Vue {
     console.log("App mounting!");
     const suggestedHs = this.$route.query.guestHs;
     await registerGuestIfNotLoggedIn(typeof(suggestedHs) === "string" ? suggestedHs : undefined);
-    const userId = this.$root.$data.sharedState.userId;
     // We should set this somewhere else.
     const client = createGlobalClient();
-    const profile = await client.getProfileInfo(userId);
-    this.$root.$data.sharedState.displayName = profile && profile.displayname ? profile.displayname : userId;
     const store = new IndexedDBStore({
       indexedDB,
     });
@@ -90,9 +89,12 @@ export default class App extends Vue {
     client.on("sync", this.onSync.bind(this));
   }
 
-  private onSync(state: string, prevState: string) {
+  private async onSync(state: string, prevState: string) {
       console.log(`Sync ${prevState}->${state}`);
       if (state === "PREPARED" && prevState === null) {
+          const client = createGlobalClient();
+          const profile = await client.getProfileInfo(this.$root.$data.sharedState.userId);
+          this.$root.$data.sharedState.displayName = profile && profile.displayname ? profile.displayname : userId;
           this.ready = true;
       }
   }
