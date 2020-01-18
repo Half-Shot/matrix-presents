@@ -4,13 +4,16 @@
         <h1 v-if="pageName"> {{ pageName }} </h1>
       </div>
       <div id="links">
-        Logged in as {{ displayName }} |
         <template v-if=!isGuest>
+          Logged in as {{ displayName }} |
           <router-link to="/">My Slides</router-link> |
           <a href="#" @click="showSettings">Settings</a> |
           <router-link to="/logout">Logout</router-link>
         </template>
-        <router-link v-else-if=isGuest to="/login">Login</router-link>
+        <template v-else-if=isGuest>
+        Guest |
+        <router-link to="/login">Login</router-link>
+        </template>
       </div>
     </div>
 </template>

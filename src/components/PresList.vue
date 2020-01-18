@@ -3,7 +3,7 @@
     <ul>
         <li v-for="room in rooms" :key="room.roomId">
             <div class="card">
-                <a :href="`/slides/${encodeURIComponent(room.roomId)}`">{{ room.name }}</a>
+                <router-link :to="`/slides/${encodeURIComponent(room.roomId)}`">{{ room.name }}</router-link>
             </div>
         </li>
         <p v-if=hasNoRooms>

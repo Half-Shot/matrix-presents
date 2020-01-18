@@ -94,7 +94,7 @@ form {
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { discoverHomeserver, loginToMatrix, logoutClient } from "../util/matrix";
+import { discoverHomeserver, loginToMatrix, logoutClient, createGlobalClient } from "../util/matrix";
 import { AutoDiscoveryError } from "matrix-js-sdk";
 import store from '../util/store';
 
@@ -179,12 +179,13 @@ export default class Login extends Vue {
       store.homeserver = this.homeserver;
       store.deviceId = loginRes.device_id;
       store.isGuest = false;
-      this.$router.push("/");
+      // XXX: hack to force the client to be re setup
+      window.location = window.location.origin;
     } catch (ex) {
       this.error = `Failed to login: ${ex.message}`;
       console.error(ex);
+      this.loginInProgress = false;
     }
-    this.loginInProgress = false;
   }
 
   private async onToggleManualHs(ev: Event) {
