@@ -11,7 +11,7 @@
         </h3>
       </header>
       <main>
-        <section class="column" v-for="(column, index) in columns" :key="index">
+        <section :class="`column ${soloClass}`" v-for="(column, index) in columns" :key="index">
           <SlideFragment
             v-for="eventId in column"
             :key="eventId"
@@ -86,6 +86,13 @@ main {
 .column:nth-child(1) {
     margin-left: 0;
 }
+
+.column.solo {
+  margin-top: 100px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
 </style>
 
 <script lang="ts">
@@ -128,6 +135,10 @@ export default class Slide extends Vue {
 
   private get author() {
     return this.room.getMember(this.slideEv!.sender).rawDisplayName;
+  }
+
+  private get soloClass() {
+    return this.columns.length === 1 ? "solo" : "multi";
   }
 
   private get authorAvatar() {
