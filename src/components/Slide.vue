@@ -1,27 +1,24 @@
 <template>
-  <div class="slide">
-    <strong v-if=loading>Loading Slide</strong>
-    <template v-else>
-      <header :class="headerClass">
-        <h1 v-if="slideEv.content.title !== undefined">{{ slideEv.content.title }}</h1>
-        <h2 v-if="slideEv.content.subtitle !== undefined">{{ slideEv.content.subtitle }}</h2>
-        <h3 v-if="author !== undefined && headerClass == 'title'">
-          {{ author }}
-          <img :src="authorAvatar" title="avatar" />
-        </h3>
-      </header>
-      <main>
-        <section :class="`column ${soloClass}`" v-for="(column, index) in columns" :key="index">
-          <SlideFragment
-            v-for="eventId in column"
-            :key="eventId"
-            :eventId="eventId"
-            :event="getEvent(eventId)"
-            :room="room"
-          />
-        </section>
-      </main>
-    </template>
+  <div class="slide" v-if=!loading>
+    <header :class="headerClass">
+      <h1 :contenteditable="editing" v-if="slideEv.content.title !== undefined" v-text="slideEv.content.title"></h1>
+      <h2 :contenteditable="editing" v-if="slideEv.content.subtitle !== undefined" v-text="slideEv.content.subtitle"></h2>
+      <h3 v-if="author !== undefined && headerClass == 'title'">
+        {{ author }}
+        <img :src="authorAvatar" title="avatar" />
+      </h3>
+    </header>
+    <main>
+      <section :class="`column ${soloClass}`" v-for="(column, index) in columns" :key="index">
+        <SlideFragment
+          v-for="eventId in column"
+          :key="eventId"
+          :eventId="eventId"
+          :event="getEvent(eventId)"
+          :room="room"
+        />
+      </section>
+    </main>
   </div>
 </template>
 
@@ -66,9 +63,10 @@ header {
 }
 
 .slide {
-    text-align: left;
-    min-width: 90vw;
-    min-height: 80vh;
+  text-align: left;
+  min-width: 90vw;
+  min-height: 80vh;
+  color: #2c3e50;
 }
 
 main {
@@ -100,6 +98,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import SlideFragment from "./SlideFragment.vue";
 import TableTennis from "./SlideFragment.vue";
 import { Room } from "matrix-js-sdk";
+import { getMatrixEvent } from "../util/matrix";
 
 const SLIDE_EVENT_TYPE = "uk.half-shot.presents.slide";
 
@@ -118,6 +117,7 @@ interface SlideEvent {
 export default class Slide extends Vue {
   @Prop() private room!: Room;
   @Prop() private eventId!: string;
+  @Prop() private editing!: boolean;
   private loading: boolean = true;
   private slideEv: SlideEvent | null = null;
 
@@ -166,12 +166,8 @@ export default class Slide extends Vue {
 
   private async getEvent(eventId: string): Promise<SlideEvent> {
     // First, try to get it from the room
-    const ev = await this.room._client.fetchRoomEvent(
-      this.room.roomId,
-      eventId,
-    );
+    const ev = await getMatrixEvent(this.room.roomId, eventId);
     return ev as SlideEvent;
   }
 }
-Vue.component("Slide", Slide);
 </script>

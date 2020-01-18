@@ -1,12 +1,18 @@
 <template>
   <div class="slide-wrapper" ref="slide" >
-    <div class="tools" v-if=!isFullscreen>
-      <strong>{{ slideEventIndex + 1 }} / {{ slideEvents.length }}</strong> |
-      <strong id="modechanger" :title="MODE_TITLE[mode]" class="mode" @click="switchMode">{{ mode }}</strong> |
-      <a @click="goFullscreen">{{ isFullscreen ? "Exit" : "Go"  }} Fullscreen</a>
-    </div>
+    <SlideTools
+      v-if=!isFullscreen
+      :room=room
+      :isFullscreen=isFullscreen
+      :slideIndex=slideEventIndex
+      :slideCount=slideEvents.length
+      :internalMode="mode"
+      :canEdit="false"
+      :onChangeMode="(m) => mode = m"
+      :onChangeFullscreen="goFullscreen"
+    />
     <strong v-if="error">{{ error }}. This room cannot be viewed.</strong>
-    <Slide v-else :eventId="slideEventId" :key="slideEventId" :room="room"/>
+    <Slide :editing="mode === 'editor'" v-else :eventId="slideEventId" :key="slideEventId" :room="room"/>
   </div>
 </template>
 
@@ -15,27 +21,32 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { Room } from "matrix-js-sdk";
 import { SlidesEventType, SlidesEvent } from "../models/SlidesEvent";
-import { PositionEventType, PositionEvent } from "../models/PositionEvent";
+import { PositionEventType } from "../models/PositionEvent";
 import Slide from "./Slide.vue";
+import SlideTools from "./Slides/SlideTools.vue";
 
-@Component
+@Component({
+  components: {
+    Slide,
+    SlideTools,
+  }
+})
 export default class SlideRoom extends Vue {
   private slideEventIndex = -1;
   private slideEvents: string[] = [];
   private error: string|null = null;
-  private mode: "presenter"|"viewer"|"unlocked" = "viewer";
+  private mode: "presenter"|"viewer"|"unlocked"|"editor" = "viewer";
   @Prop() private room!: Room;
 
   private isFullscreen = false;
 
-  private readonly MODE_TITLE = {
-    viewer: "Locked to the presenters view",
-    unlocked: "Unlocked to explore the presentation",
-    presenter: "Present to other people in viewer mode",
-  };
+  private get canEdit() {
+    const state = this.room.currentState;
+    return state && state.maySendEvent("uk.half-shot.presents.slide", this.room.myUserId)
+     && state.maySendStateEvent("uk.half-shot.presents.slides", this.room.myUserId);
+  }
 
   private beforeMount() {
-
     const state = this.room.getLiveTimeline().getState("f");
     const t = state.getStateEvents(SlidesEventType, "") as SlidesEvent;
     if (t === null) {
@@ -121,26 +132,8 @@ export default class SlideRoom extends Vue {
     }
   }
 
-  private switchMode() {
-    if (this.mode === "viewer") {
-      this.mode = "unlocked";
-      return;
-    }
-    if (this.mode === "presenter") {
-      this.mode = "viewer";
-      return;
-    }
-    // unlocked
-    const state = this.room.getLiveTimeline().getState("f");
-    // Can this user be a presenter?
-    const canMovePosition = state.maySendStateEvent(
-      PositionEventType, this.$root.$data.sharedState.userId,
-    );
-    if (canMovePosition) {
-      this.mode = "presenter";
-    } else {
-      this.mode = "viewer";
-    }
+  private toggleEditor() {
+    this.mode = this.mode === "editor" ? "unlocked" : "editor";
   }
 
   private onEvent(event: any) {

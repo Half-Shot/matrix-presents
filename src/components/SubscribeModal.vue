@@ -1,7 +1,7 @@
 <template>
-    <Modal class="subscribe-modal" title="Subscribe to a SlideSet" :closeFn="closeFn">
+    <Modal class="subscribe-modal" title="Subscribe to a Slideshow" :closeFn="closeFn">
         <div slot="body">
-            <p>You may subscribe to a slideset by joining the Matrix room.</p>
+            <p>You may subscribe to a slideshow by joining the Matrix room.</p>
             <form @submit="onSubmit">
                 <label for="roomId">Room: </label>
                 <input placeholder="#slides:example.com" v-model="roomId" type="text"/>

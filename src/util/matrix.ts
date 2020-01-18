@@ -57,6 +57,25 @@ export function getClient() {
     return matrixClient ? matrixClient : createGlobalClient();
 }
 
+const eventCache: Map<string, any> = new Map();
+
+export async function getMatrixEvent(roomId: string, eventId: string) {
+    const key = `${roomId} ${eventId}`;
+    const existing = eventCache.get(key);
+    if (existing) {
+        console.log(`Got cached event ${key}`);
+        return existing;
+    }
+    const client = getClient();
+    const ev = await client.fetchRoomEvent(
+        roomId,
+        eventId,
+    );
+    console.log(`Got non-cached event ${key}`);
+    eventCache.set(key, ev);
+    return ev;
+}
+
 
 export async function logoutClient() {
     try {
