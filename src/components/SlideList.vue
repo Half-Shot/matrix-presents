@@ -2,11 +2,12 @@
   <div class="slide-list">
     <ul>
         <li v-for="room in rooms" :key="room.roomId">
-            <div class="card">
-                <router-link :to="`/slides/${encodeURIComponent(room.roomId)}`">{{ room.name }}</router-link>
-            </div>
+            <SlideCard :room="room"/>
         </li>
-        <p v-if=hasNoRooms>
+        <p v-if="hasNoRooms && filterOwn">
+            You have not created any slides yet.
+        </p>
+        <p v-else-if="hasNoRooms && !filterOwn ">
             You are not currently subscribed to any Slides.
         </p>
     </ul>
@@ -16,11 +17,16 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { getClient } from "@/util/matrix";
+import SlideCard from "@/components/SlideCard.vue";
 
 const STATE_KEY = "uk.half-shot.presents.slides";
 
-@Component
-export default class PresList extends Vue {
+@Component({
+    components: {
+        SlideCard,
+    }
+})
+export default class SlideList extends Vue {
     @Prop() private filterOwn!: boolean;
     private rooms: any[] = [];
 
@@ -33,22 +39,23 @@ export default class PresList extends Vue {
     }
 
     public beforeMount() {
-        console.log("beforeMount PresList");
         this.regenerateRoomList();
     }
 
     private regenerateRoomList() {
         const client = getClient();
         this.rooms = [];
-        console.log(client.getRooms());
         client.getRooms().forEach((room) => {
             const state = room.getLiveTimeline().getState("f");
             const t = state.getStateEvents(STATE_KEY, "");
-            console.log(t);
             if (!t) {
                 return;
             }
-            this.rooms.push(room);
+            console.log(t.getContent());
+            const isOwnSlide = t.sender === client.getUserId();
+            if (isOwnSlide && this.filterOwn || !isOwnSlide && !this.filterOwn) {
+                this.rooms.push(room);
+            }
         });
         console.log("Finished generating room list");
     }
@@ -58,8 +65,8 @@ export default class PresList extends Vue {
 <style scoped lang="scss">
 ul {
     list-style: none;
-}
-.card {
-
+    li {
+        margin-bottom: 5px;
+    }
 }
 </style>
