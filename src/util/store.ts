@@ -1,3 +1,5 @@
+import config from "../../config.json";
+
 interface State {
     userId: string|null;
     displayName?: string;
@@ -27,7 +29,7 @@ class Store {
     }
 
     public get defaultHomeserver(): string {
-        return "https://matrix.org";
+        return config.guest_homeserver || "https://matrix.org";
     }
 
     public set userId(userId: string|null) {

@@ -17,13 +17,16 @@ export async function loginToMatrix(homeserver: string, username: string, passwo
     });
 }
 
-export async function registerGuestIfNotLoggedIn(suggestedHs?: string) {
+export async function registerGuestIfNotLoggedIn(suggestedHs: string|null) {
     // Create a guest
     if (Store.accessToken) {
         return;
     }
-    console.log("Creating a guest account");
-    const baseUrl = Store.homeserver || suggestedHs || Store.defaultHomeserver;
+    if (suggestedHs && !suggestedHs.startsWith("http")) {
+        suggestedHs = `https://${suggestedHs}`;
+    }
+    const baseUrl = suggestedHs || Store.homeserver || Store.defaultHomeserver;
+    console.log(`Creating a guest account on ${baseUrl}`);
     const res = await createClient({
         baseUrl,
     }).registerGuest();
