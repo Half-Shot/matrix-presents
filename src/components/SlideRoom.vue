@@ -2,7 +2,7 @@
   <div class="slide-wrapper" ref="slide" >
     <div class="tools" v-if=!isFullscreen>
       <strong>{{ slideEventIndex + 1 }} / {{ slideEvents.length }}</strong> |
-      <strong :title="MODE_TITLE[mode]" class="mode" @click="switchMode"> {{ mode }} </strong> |
+      <strong id="modechanger" :title="MODE_TITLE[mode]" class="mode" @click="switchMode">{{ mode }}</strong> |
       <a @click="goFullscreen">{{ isFullscreen ? "Exit" : "Go"  }} Fullscreen</a>
     </div>
     <strong v-if="error">{{ error }}. This room cannot be viewed.</strong>
@@ -203,5 +203,9 @@ a {
 
 .slide-wrapper {
   background: white;
+}
+
+#modechanger {
+  text-decoration: underline;
 }
 </style>
