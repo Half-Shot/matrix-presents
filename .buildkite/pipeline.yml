@@ -3,6 +3,7 @@ steps:
     command:
       # Due to permission issues with /.yarnrc, this will return false.
       - "yarn install --ignore-scripts || true"
+      - "cp config.sample.json config.json"
       - "yarn build"
     plugins:
       - docker#v3.5.0:
