@@ -60,5 +60,14 @@ code {
     font-size: 2vh;
 }
 
+.fragment > .html {
+    h1 {
+        font-size: 48pt;
+    }
+
+    h2 {
+        font-size: 38pt;
+    }
+}
 
 </style>

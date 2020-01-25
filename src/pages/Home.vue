@@ -2,20 +2,26 @@
   <div class="home">
     <div class="home-grid">
       <section>
-        <h2>Your Slides</h2>
-        <PresList :filterOwn="true"/>
+        <h2><home-icon size="1x"></home-icon> Your Slides</h2>
+        <SlideList :filterOwn="true"/>
         <ul class="button-set">
             <li>
-                <button disabled="true" @click="showCreateModal = true"> Create Slideshow </button>
+                <ActionButton disabled="true" :click="() => showCreateModal = true">
+                  <EditIcon size="1x"/>
+                  Create Slideshow
+                </ActionButton>
             </li>
-        </ul>   
+        </ul>
       </section>
       <section>
-        <h2>Subscribed Slides</h2>
-        <PresList :filterOwn="false"/>
+        <h2><rss-icon size="1x"></rss-icon> Subscribed Slides</h2>
+        <SlideList :filterOwn="false"/>
         <ul class="button-set">
             <li>
-                <button @click="showSubscribeModal = true"> Subscribe to Slideshow </button>
+                <ActionButton :click="() => showSubscribeModal = true">
+                  <PlusCircleIcon size="1x"/>
+                  Subscribe to Slideshow
+                </ActionButton>
             </li>
         </ul>   
       </section>
@@ -55,16 +61,23 @@
 </style>
 
 <script lang="ts">
-import PresList from "../components/PresList.vue";
+import { HomeIcon, RssIcon, PlusCircleIcon, EditIcon } from 'vue-feather-icons'
+import SlideList from "../components/SlideList.vue";
 import SubscribeModal from "../components/SubscribeModal.vue";
-
+import ActionButton from "@/components/ActionButton.vue";
 import Component from "vue-class-component";
 import Vue from "vue";
 
+
 @Component({
   components: {
-    PresList,
+    SlideList,
     SubscribeModal,
+    HomeIcon,
+    RssIcon,
+    ActionButton,
+    PlusCircleIcon,
+    EditIcon,
   },
   name: "home",
 })

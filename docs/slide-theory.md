@@ -55,14 +55,14 @@ set correctly. Anyone able to send any event is considered a **Contributor**.
 Slide events will contain references to the child events.
 
 An example `uk.half-shot.presents.slide` event:
-```
+```json
 {
     "title": "Foobar",
     "subtitle": "The need for foo",
-    "columns" [
+    "columns": [
         ["!foobar:example.com"],
-        ["!bar:baz.com"],
-    ],
+        ["!bar:baz.com"]
+    ]
 }
 ```
 *Example event content for `uk.half-shot.presents.slide`*
