@@ -2,6 +2,8 @@ steps:
   - label: ':hammer: Build'
     command:
       - "yarn install"
+      # Fix permission issues
+      - "chmod -R a+rwx node_modules"
       - "yarn build"
     plugins:
       - docker#v3.5.0:
