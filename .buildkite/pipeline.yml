@@ -1,12 +1,11 @@
 steps:
   - label: ':hammer: Build'
     command:
-      - "yarn install"
-      # Fix permission issues
-      - "chmod -R a+rwx node_modules"
+      - "yarn install --ignore-scripts"
       - "yarn build"
     plugins:
       - docker#v3.5.0:
+          user: 993
           image: "node:12"
 
   - label: ':eslint: Linting'
@@ -14,5 +13,6 @@ steps:
       - "yarn lint"
     plugins:
       - docker#v3.5.0:
+          user: 993
           image: "node:12"
 
