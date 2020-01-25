@@ -9,7 +9,6 @@ steps:
 
   - label: ':eslint: Linting'
     command:
-      - "yarn install"
       - "yarn lint"
     plugins:
       - docker#v3.5.0:
