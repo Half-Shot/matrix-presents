@@ -2,7 +2,7 @@ steps:
   - label: ':hammer: Build'
     command:
       # Due to permission issues with /.yarnrc, this will return false.
-      - "yarn install --ignore-scripts || true"
+      - "yarn install || true"
       - "cp config.sample.json config.json"
       - "yarn build"
     plugins:
@@ -12,6 +12,7 @@ steps:
 
   - label: ':eslint: Linting'
     command:
+      - "yarn install || true"
       - "yarn lint"
     plugins:
       - docker#v3.5.0:
