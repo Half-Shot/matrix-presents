@@ -1,7 +1,8 @@
 steps:
   - label: ':hammer: Build'
     command:
-      - "yarn install --ignore-scripts"
+      # Due to permission issues with /.yarnrc, this will return false.
+      - "yarn install --ignore-scripts || true"
       - "yarn build"
     plugins:
       - docker#v3.5.0:
