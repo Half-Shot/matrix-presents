@@ -36,6 +36,7 @@ declare module "matrix-js-sdk" {
         public getUserId(): string;
         public fetchRoomEvent(roomId: string, eventId: string): Promise<any>;
         public registerGuest(): Promise<any>;
+        public startClient(): void;
     }
     export class AutoDiscovery {
         public static findClientConfig(domain: string): Promise<DiscoveredClientConfig>;

@@ -153,7 +153,6 @@ export default class Slide extends Vue {
       .then((ev) => {
         console.log(`Loaded event`);
         this.slideEv = ev;
-        console.log(this.slideEv);
       })
       .catch((ex) => {
         console.error("Error fetching event for slide:", ex);
