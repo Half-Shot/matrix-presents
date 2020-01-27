@@ -17,4 +17,4 @@ yarn serve
 
 ## Docs
 
-- (Very rough) [Slide Theory](docs/slide-theory.md)
+- [Slide Theory](docs/slide-theory.md) contains some information about how Presents uses Matrix events and rooms.

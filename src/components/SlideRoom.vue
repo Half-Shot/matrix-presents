@@ -1,41 +1,90 @@
 <template>
   <div class="slide-wrapper" ref="slide" >
-    <div class="tools" v-if=!isFullscreen>
-      <strong>{{ slideEventIndex + 1 }} / {{ slideEvents.length }}</strong> |
-      <strong :title="MODE_TITLE[mode]" class="mode" @click="switchMode"> {{ mode }} </strong> |
-      <a @click="goFullscreen">{{ isFullscreen ? "Exit" : "Go"  }} Fullscreen</a>
-    </div>
+    <SlideTools
+      v-if=!isFullscreen
+      :room=room
+      :isFullscreen=isFullscreen
+      :slideIndex=slideEventIndex
+      :slideCount=slideEvents.length
+      :internalMode="mode"
+      :canEdit="false"
+      :onChangeMode="(m) => mode = m"
+      :onChangeFullscreen="goFullscreen"
+    />
     <strong v-if="error">{{ error }}. This room cannot be viewed.</strong>
-    <Slide v-else :eventId="slideEventId" :key="slideEventId" :room="room"/>
+    <div class="inner-wrapper" v-else>
+      <Slide :class="oldSlideClass" v-if="animating" :eventId="oldSlideEventId" :room="room"/>
+      <Slide v-if="!animating" :editing="mode === 'editor'" :eventId="slideEventId" :key="slideEventId" :room="room"/>
+      <Slide :class="newSlideClass" v-if="animating" :eventId="slideEventId" :room="room"/>
+    </div>
   </div>
 </template>
+
+<style lang="scss" scoped>
+.inner-wrapper {
+  position: relative;
+}
+.inner-wrapper > * {
+  z-index: 5;
+  float: left;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation-duration: 0.75s;
+}
+</style>
 
 <script lang="ts">
 
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { Room } from "matrix-js-sdk";
 import { SlidesEventType, SlidesEvent } from "../models/SlidesEvent";
-import { PositionEventType, PositionEvent } from "../models/PositionEvent";
+import { PositionEventType } from "../models/PositionEvent";
 import Slide from "./Slide.vue";
+import SlideTools from "./Slides/SlideTools.vue";
+import { getMatrixEvent } from '../util/matrix';
+import "../../node_modules/animate.css/animate.css"
 
-@Component
+@Component({
+  components: {
+    Slide,
+    SlideTools,
+  }
+})
 export default class SlideRoom extends Vue {
+  private animating: "forwards"|"backwards"|null = null;
   private slideEventIndex = -1;
   private slideEvents: string[] = [];
   private error: string|null = null;
-  private mode: "presenter"|"viewer"|"unlocked" = "viewer";
+  private mode: "presenter"|"viewer"|"unlocked"|"editor" = "viewer";
   @Prop() private room!: Room;
 
   private isFullscreen = false;
 
-  private readonly MODE_TITLE = {
-    viewer: "Locked to the presenters view",
-    unlocked: "Unlocked to explore the presentation",
-    presenter: "Present to other people in viewer mode",
-  };
+  private get oldSlideClass() {
+    if (this.animating === "forwards") {
+      return "fadeOutLeft";
+    } else if (this.animating === "backwards") {
+      return "fadeOutRight";
+    }
+    return "";
+  }
+
+  private get newSlideClass() {
+    if (this.animating === "forwards") {
+      return "fadeInRight";
+    } else if (this.animating === "backwards") {
+      return "fadeInLeft";
+    }
+  }
+
+  private get canEdit() {
+    const state = this.room.currentState;
+    return state && state.maySendEvent("uk.half-shot.presents.slide", this.room.myUserId)
+     && state.maySendStateEvent("uk.half-shot.presents.slides", this.room.myUserId);
+  }
 
   private beforeMount() {
-
     const state = this.room.getLiveTimeline().getState("f");
     const t = state.getStateEvents(SlidesEventType, "") as SlidesEvent;
     if (t === null) {
@@ -48,6 +97,10 @@ export default class SlideRoom extends Vue {
 
     window.addEventListener("keydown", this.onKeyPress.bind(this));
     window.addEventListener("fullscreenchange", () => this.isFullscreen = !this.isFullscreen);
+
+    this.bufferSlides().then(() => {
+      console.log("Finished buffering slides");
+    })
   }
 
   private advanceSlide() {
@@ -60,6 +113,11 @@ export default class SlideRoom extends Vue {
     this.slideEventIndex += 1;
     this.updateEvent();
     console.log(`Advancing slide to ${this.slideEventIndex} ${this.slideEventId}`);
+    this.animating = "forwards";
+    setTimeout(() => {
+      this.animating = null;
+      this.updateEvent();
+    }, 750);
 
     if (this.mode === "presenter") {
       this.room._client.sendStateEvent(
@@ -82,6 +140,11 @@ export default class SlideRoom extends Vue {
     this.slideEventIndex -= 1;
     this.updateEvent();
     console.log(`Going back to${this.slideEventIndex} ${this.slideEventId}`);
+    this.animating = "backwards";
+    setTimeout(() => {
+      this.animating = null;
+      this.updateEvent();
+    }, 750);
 
     if (this.mode === "presenter") {
       this.room._client.sendStateEvent(
@@ -98,6 +161,15 @@ export default class SlideRoom extends Vue {
     return this.slideEvents[this.slideEventIndex] || null;
   }
 
+  private get oldSlideEventId() {
+    if (this.animating === "forwards") {
+      return this.slideEvents[this.slideEventIndex - 1] || null;
+    } else if (this.animating === "backwards") {
+      return this.slideEvents[this.slideEventIndex + 1] || null;
+    }
+    return this.slideEventId;
+  }
+
   private onKeyPress(ev: KeyboardEvent) {
     ev.preventDefault();
     if (ev.keyCode === 39) { // Right
@@ -107,26 +179,8 @@ export default class SlideRoom extends Vue {
     }
   }
 
-  private switchMode() {
-    if (this.mode === "viewer") {
-      this.mode = "unlocked";
-      return;
-    }
-    if (this.mode === "presenter") {
-      this.mode = "viewer";
-      return;
-    }
-    // unlocked
-    const state = this.room.getLiveTimeline().getState("f");
-    // Can this user be a presenter?
-    const canMovePosition = state.maySendStateEvent(
-      PositionEventType, this.$root.$data.sharedState.userId,
-    );
-    if (canMovePosition) {
-      this.mode = "presenter";
-    } else {
-      this.mode = "viewer";
-    }
+  private toggleEditor() {
+    this.mode = this.mode === "editor" ? "unlocked" : "editor";
   }
 
   private onEvent(event: any) {
@@ -183,6 +237,18 @@ export default class SlideRoom extends Vue {
   private updateEvent(index?: number) {
     this.$router.push(`/slides/${this.room.roomId}/${this.slideEventId}`);
   }
+
+  private async bufferSlides() {
+    // This will pull in events for all slides in the background.
+    for (const slideId of this.slideEvents) {
+      const slideEv = await getMatrixEvent(this.room.roomId, slideId);
+      for (const fragmentColumn of slideEv.content.columns || []) {
+        for (const fragmentId of fragmentColumn) {
+          await getMatrixEvent(this.room.roomId, fragmentId);
+        }
+      }
+    }
+  }
 }
 </script>
 
@@ -209,5 +275,9 @@ a {
 
 .slide-wrapper {
   background: white;
+}
+
+#modechanger {
+  text-decoration: underline;
 }
 </style>

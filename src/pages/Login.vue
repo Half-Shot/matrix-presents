@@ -12,5 +12,8 @@ export default {
   components: {
     Login,
   },
+  beforeMount: () => {
+    this.$root.$data.sharedState.pageName = "Login";
+  }
 };
 </script>

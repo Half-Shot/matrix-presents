@@ -26,6 +26,7 @@ declare module "matrix-js-sdk" {
         public on(event: string, listener: (...params: []) => any): MatrixClient;
         public on(event: "sync", listener: (state: string, prevState: string, data: any) => void): MatrixClient;
         public on(event: "event", listener: (event: {event: any}) => void): MatrixClient;
+        public on(event: "Room.name", listener: (room: Room) => void): MatrixClient;
         public once(event: string, listener: (...params: []) => any): MatrixClient;
         public removeListener(event: string, listener: any): MatrixClient;
         public getSyncState(): string|null;
@@ -35,6 +36,7 @@ declare module "matrix-js-sdk" {
         public getUserId(): string;
         public fetchRoomEvent(roomId: string, eventId: string): Promise<any>;
         public registerGuest(): Promise<any>;
+        public startClient(): void;
     }
     export class AutoDiscovery {
         public static findClientConfig(domain: string): Promise<DiscoveredClientConfig>;

@@ -48,7 +48,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: $color-primary-4;
 }
 
 .router-wrapper {
@@ -79,8 +79,12 @@ export default class App extends Vue {
 
   private async beforeMount() {
     console.log("App mounting!");
-    const suggestedHs = this.$route.query.guestHs;
-    await registerGuestIfNotLoggedIn(typeof(suggestedHs) === "string" ? suggestedHs : undefined);
+
+  }
+
+  private async mounted() {
+    const suggestedHs = this.$route.query.guesths as string|null;
+    await registerGuestIfNotLoggedIn(suggestedHs);
     // We should set this somewhere else.
     const client = createGlobalClient();
     client.startClient();

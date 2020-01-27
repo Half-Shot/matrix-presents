@@ -49,26 +49,43 @@ export default class Slides extends Vue {
     await this.loadRoomInfo();
   }
 
+  private async beforeDestroy() {
+    const client = getClient();
+    client.removeListener("Room.name", this.onRoomName);
+  }
+
+  private async mounted() {
+    if (this.$root.$data.sharedState.isGuest) {
+      console.log("Autojoining since user is a guest");
+      await this.joinRoom();
+    }
+  }
+
   private async joinRoom() {
     this.error = null;
     const client = getClient();
     try {
       const res = await client.joinRoom(this.$route.params.roomId);
       this.roomId = res.room_id || this.$route.params.roomId;
+      client.once("Room", (room: Room) => {
+        if (this.roomId === room.roomId) {
+          this.loadRoomInfo(room);
+        }
+      });
       // XXX: Slightly evil
-      await this.loadRoomInfo();
     } catch (ex) {
       console.error("Failed to join room", ex);
       this.error = ex.message;
     }
   }
 
-  private async loadRoomInfo() {
+  private async loadRoomInfo(room?: Room) {
     if (!this.room) {
       // TODO: Lazy validation
       this.validRoomId = (this.roomId.startsWith("!") || this.roomId.startsWith("#")) && this.roomId.includes(":");
     }
     if (!this.validRoomId) {
+      console.log("RoomID isn't valid");
       return;
     }
 
@@ -81,10 +98,18 @@ export default class Slides extends Vue {
         return;
       }
     }
-    this.room = client.getRoom(this.roomId);
+    this.room = room || client.getRoom(this.roomId);
     this.$root.$data.sharedState.pageName = this.room ? this.room.name : this.roomId;
     console.log("Got room", this.room);
+    if (this.room) {
+      client.on("Room.name", this.onRoomName.bind(this));
+    }
+  }
 
+  private async onRoomName(room: Room) {
+    if (room.roomId === this.roomId) {
+      this.$root.$data.sharedState.pageName = room.name;
+    }
   }
 }
 </script>
