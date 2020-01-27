@@ -1,8 +1,8 @@
 <template>
   <div class="slide" v-if=!loading>
     <header :class="headerClass">
-      <h1 :contenteditable="editing" v-if="slideEv.content.title !== undefined" v-text="slideEv.content.title"></h1>
-      <h2 :contenteditable="editing" v-if="slideEv.content.subtitle !== undefined" v-text="slideEv.content.subtitle"></h2>
+      <h1 v-if="slideEv.getContent().title !== undefined" v-text="slideEv.getContent().title"></h1>
+      <h2 v-if="slideEv.getContent().subtitle !== undefined" v-text="slideEv.getContent().subtitle"></h2>
       <h3 v-if="author !== undefined && headerClass == 'title'">
         {{ author }}
         <img :src="authorAvatar" title="avatar" />
@@ -14,7 +14,7 @@
           v-for="eventId in column"
           :key="eventId"
           :eventId="eventId"
-          :event="getEvent(eventId)"
+          :event="getEvent(room.roomId, eventId)"
           :room="room"
         />
       </section>
@@ -113,7 +113,6 @@ interface SlideEvent {
 export default class Slide extends Vue {
   @Prop() private room!: Room;
   @Prop() private eventId!: string;
-  @Prop() private editing!: boolean;
   private loading = true;
   private slideEv: MatrixEvent | null = null;
 
@@ -127,6 +126,10 @@ export default class Slide extends Vue {
 
   private get columns() {
     return this.slideEv?.getContent().columns || [];
+  }
+
+  private getEvent(roomId: string, eventId: string) {
+    return getMatrixEvent(roomId, eventId);
   }
 
   private get author() {
@@ -153,7 +156,7 @@ export default class Slide extends Vue {
     console.log(`Loading ${this.eventId}`);
     getMatrixEvent(this.room.roomId, this.eventId)
       .then((ev) => {
-        console.log(`Loaded event`);
+        console.log(`Loaded event`, ev);
         this.slideEv = ev;
       })
       .catch((ex) => {

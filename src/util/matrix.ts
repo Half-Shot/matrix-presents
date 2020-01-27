@@ -73,10 +73,10 @@ export async function getMatrixEvent(roomId: string, eventId: string) {
         return existing;
     }
     const client = getClient();
-    const ev = await client.fetchRoomEvent(
+    const ev = new MatrixEvent(await client.fetchRoomEvent(
         roomId,
         eventId,
-    );
+    ));
     console.log(`Got non-cached event ${key}`);
     eventCache.set(key, ev);
     return ev;

@@ -31,6 +31,7 @@
   top: 0;
   left: 0;
   animation-duration: 0.75s;
+  width: 100%;
 }
 </style>
 
