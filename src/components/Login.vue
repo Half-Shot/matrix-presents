@@ -93,20 +93,20 @@ form {
 </style>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import { discoverHomeserver, loginToMatrix, logoutClient, createGlobalClient } from "../util/matrix";
+import { Component, Vue } from "vue-property-decorator";
+import { discoverHomeserver, loginToMatrix, logoutClient } from "../util/matrix";
 import { AutoDiscoveryError } from "matrix-js-sdk";
 import store from '../util/store';
 
 @Component
 export default class Login extends Vue {
-  private username: string = "";
-  private password: string = "";
+  private username = "";
+  private password = "";
   private error: string|null = null;
-  private specifyHs: boolean = false;
+  private specifyHs = false;
   private wellKnownError: string|null = null;
-  private homeserver: string = "";
-  private loginInProgress: boolean = false;
+  private homeserver = "";
+  private loginInProgress = false;
 
   private get canLogin() {
     return this.validateForm().length === 0 && !this.loginInProgress;
@@ -144,7 +144,7 @@ export default class Login extends Vue {
     return errors;
   }
 
-  private async onUsernameChange(ev: Event) {
+  private async onUsernameChange() {
     if (this.username === "" || this.specifyHs) {
       return;
     }
@@ -180,7 +180,7 @@ export default class Login extends Vue {
       store.deviceId = loginRes.device_id;
       store.isGuest = false;
       // XXX: hack to force the client to be re setup
-      window.location = window.location.origin;
+      (window.location as unknown as string) = window.location.origin;
     } catch (ex) {
       this.error = `Failed to login: ${ex.message}`;
       console.error(ex);
@@ -188,13 +188,13 @@ export default class Login extends Vue {
     }
   }
 
-  private async onToggleManualHs(ev: Event) {
+  private async onToggleManualHs() {
     if (this.specifyHs) {
       this.wellKnownError = null;
       return;
     }
     // Force re-evaluate.
-    await this.onUsernameChange(ev);
+    await this.onUsernameChange();
   }
 }
 </script>

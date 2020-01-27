@@ -49,7 +49,7 @@
 </style>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component } from "vue-property-decorator";
 import Modal from "./Modal.vue";
 import GeneralTab from "./SettingsModalTabs/GeneralTab.vue";
 import KeymappingTab from "./SettingsModalTabs/KeymappingTab.vue";

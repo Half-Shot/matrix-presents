@@ -1,4 +1,4 @@
-import { AutoDiscovery, createClient, MatrixClient, IndexedDBStore } from "matrix-js-sdk";
+import { AutoDiscovery, createClient, MatrixClient, IndexedDBStore, MatrixEvent } from "matrix-js-sdk";
 import Store from "./store";
 
 let matrixClient: MatrixClient|undefined;
@@ -8,7 +8,7 @@ export async function discoverHomeserver(domain: string) {
 }
 
 export async function loginToMatrix(homeserver: string, username: string, password: string) {
-    return createClient(homeserver).login("m.login.password", {
+    return createClient({ baseUrl: homeserver }).login("m.login.password", {
         identifier: {
             type: "m.id.user",
             user: username,
@@ -37,18 +37,24 @@ export async function registerGuestIfNotLoggedIn(suggestedHs: string|null) {
 }
 
 export function createGlobalClient() {
+    if (!Store.homeserver) {
+        throw Error("Tried to createGlobalClient, but Store.homeserver is not set");
+    }
     const store = new IndexedDBStore({
-        indexedDB,
+        indexedDB: window.indexedDB,
     });
     store.startup();
     matrixClient = createClient({
-        baseUrl: Store.homeserver!,
-        accessToken: Store.accessToken!,
-        userId: Store.userId!,
-        deviceId: Store.deviceId!,
+        baseUrl: Store.homeserver,
+        accessToken: Store.accessToken,
+        userId: Store.userId || undefined,
+        deviceId: Store.deviceId,
         store,
     });
-    window.mxClient = matrixClient;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).mxClient = matrixClient;
+
     matrixClient.setGuest(Store.isGuest);
     return matrixClient;
 }
@@ -57,7 +63,7 @@ export function getClient() {
     return matrixClient ? matrixClient : createGlobalClient();
 }
 
-const eventCache: Map<string, any> = new Map();
+const eventCache: Map<string, MatrixEvent> = new Map();
 
 export async function getMatrixEvent(roomId: string, eventId: string) {
     const key = `${roomId} ${eventId}`;

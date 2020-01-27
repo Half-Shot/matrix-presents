@@ -37,8 +37,8 @@
 <script lang="ts">
 
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { Room } from "matrix-js-sdk";
-import { SlidesEventType, SlidesEvent } from "../models/SlidesEvent";
+import { Room, MatrixEvent } from "matrix-js-sdk";
+import { SlidesEventType } from "../models/SlidesEvent";
 import { PositionEventType } from "../models/PositionEvent";
 import Slide from "./Slide.vue";
 import SlideTools from "./Slides/SlideTools.vue";
@@ -85,15 +85,18 @@ export default class SlideRoom extends Vue {
   }
 
   private beforeMount() {
-    const state = this.room.getLiveTimeline().getState("f");
-    const t = state.getStateEvents(SlidesEventType, "") as SlidesEvent;
-    if (t === null) {
+    const stateEvent = this.room.currentState.getStateEvents(SlidesEventType, "");
+    if (stateEvent === null) {
       this.error = "The required state for this room was not found";
       return;
     }
-    this.updateSlideSet(t);
+    if (stateEvent instanceof Array) {
+      // This cannot happen, but to make types happy...
+      return;
+    }
+    this.updateSlideSet(stateEvent);
 
-    this.room._client.on("event", this.onEvent);
+    this.room._client.on("event", this.onEvent.bind(this));
 
     window.addEventListener("keydown", this.onKeyPress.bind(this));
     window.addEventListener("fullscreenchange", () => this.isFullscreen = !this.isFullscreen);
@@ -183,27 +186,28 @@ export default class SlideRoom extends Vue {
     this.mode = this.mode === "editor" ? "unlocked" : "editor";
   }
 
-  private onEvent(event: any) {
-    if (event.event.room_id !== this.room.roomId) {
+  private onEvent(event: MatrixEvent) {
+    if (event.getRoomId() !== this.room.roomId) {
       return;
     }
-    if (event.event.type === PositionEventType && event.event.state_key === undefined) {
+    if (event.getType() === PositionEventType && !event.isState()) {
       if (this.mode !== "viewer") {
         return;
       }
-      console.log("New position from presenter", event.event.content.event_id);
+      const eventId = event.getContent().event_id;
+      console.log("New position from presenter", eventId);
       this.updateEvent();
-      this.slideEventIndex = this.slideEvents.indexOf(event.event.content.event_id);
+      this.slideEventIndex = this.slideEvents.indexOf(eventId);
       if (this.slideEventIndex === -1) {
-        console.error(`Could not find ${event.event.content.event_id} in show`);
+        console.error(`Could not find ${eventId} in show`);
       }
     }
-    if (event.event.type === SlidesEventType && event.event.state_key === "") {
-      return this.updateSlideSet(event.event);
+    if (event.getType() === SlidesEventType && event.getStateKey() === "") {
+      return this.updateSlideSet(event);
     }
   }
   
-  private updateSlideSet(t: any) {
+  private updateSlideSet(t: MatrixEvent) {
     const content = t.getContent();
     this.slideEvents = content.slides;
     if (this.slideEvents === undefined || this.slideEvents.length === 0) {
@@ -234,7 +238,7 @@ export default class SlideRoom extends Vue {
     window.removeEventListener("keypress", this.onKeyPress);
   }
 
-  private updateEvent(index?: number) {
+  private updateEvent() {
     this.$router.push(`/slides/${this.room.roomId}/${this.slideEventId}`);
   }
 
@@ -242,7 +246,7 @@ export default class SlideRoom extends Vue {
     // This will pull in events for all slides in the background.
     for (const slideId of this.slideEvents) {
       const slideEv = await getMatrixEvent(this.room.roomId, slideId);
-      for (const fragmentColumn of slideEv.content.columns || []) {
+      for (const fragmentColumn of slideEv.getContent().columns || []) {
         for (const fragmentId of fragmentColumn) {
           await getMatrixEvent(this.room.roomId, fragmentId);
         }

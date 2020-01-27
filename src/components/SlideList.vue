@@ -18,6 +18,7 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { getClient } from "@/util/matrix";
 import SlideCard from "@/components/SlideCard.vue";
+import { Room } from 'matrix-js-sdk';
 
 const STATE_KEY = "uk.half-shot.presents.slides";
 
@@ -28,7 +29,7 @@ const STATE_KEY = "uk.half-shot.presents.slides";
 })
 export default class SlideList extends Vue {
     @Prop() private filterOwn!: boolean;
-    private rooms: any[] = [];
+    private rooms: Room[] = [];
 
     private get hasNoRooms() {
         return this.rooms.length === 0;

@@ -14,8 +14,8 @@ import { MatrixClient } from 'matrix-js-sdk';
 export default class TableTennis extends Vue {
     @Prop() private client!: MatrixClient;
 
-    private puckTop: number = 50;
-    private puckLeft: number = 50;
+    private puckTop = 50;
+    private puckLeft = 50;
 
     private beforeMount() {
         console.log("Mounted table tennis");

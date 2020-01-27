@@ -95,12 +95,8 @@ main {
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import SlideFragment from "./SlideFragment.vue";
-import TableTennis from "./SlideFragment.vue";
-import { Room } from "matrix-js-sdk";
+import { Room, MatrixEvent } from "matrix-js-sdk";
 import { getMatrixEvent } from "../util/matrix";
-
-const SLIDE_EVENT_TYPE = "uk.half-shot.presents.slide";
 
 interface SlideEvent {
   type: "uk.half-shot.presents.slide";
@@ -118,23 +114,26 @@ export default class Slide extends Vue {
   @Prop() private room!: Room;
   @Prop() private eventId!: string;
   @Prop() private editing!: boolean;
-  private loading: boolean = true;
-  private slideEv: SlideEvent | null = null;
+  private loading = true;
+  private slideEv: MatrixEvent | null = null;
 
   private get isPong() {
-    return (this.slideEv && this.slideEv!.content.pong === true);
+    return this.slideEv?.getContent().pong === true;
   }
 
   private get headerClass() {
-    return this.slideEv!.content.columns ? "normal" : "title";
+    return (this.slideEv?.getContent().columns) ? "normal" : "title";
   }
 
   private get columns() {
-    return this.slideEv!.content.columns || [];
+    return this.slideEv?.getContent().columns || [];
   }
 
   private get author() {
-    return this.room.getMember(this.slideEv!.sender).rawDisplayName;
+    if (!this.slideEv) {
+      return null;
+    }
+    return this.slideEv.getSender().rawDisplayName;
   }
 
   private get soloClass() {
@@ -142,14 +141,17 @@ export default class Slide extends Vue {
   }
 
   private get authorAvatar() {
-    return this.room
-      .getMember(this.slideEv!.sender)
+    if (!this.slideEv) {
+      return null;
+    }
+  
+    return this.slideEv.getSender()
       .getAvatarUrl(this.room._client.getHomeserverUrl(), 64, 64, "scale");
   }
 
   private beforeMount() {
     console.log(`Loading ${this.eventId}`);
-    this.getEvent(this.eventId)
+    getMatrixEvent(this.room.roomId, this.eventId)
       .then((ev) => {
         console.log(`Loaded event`);
         this.slideEv = ev;
@@ -161,12 +163,6 @@ export default class Slide extends Vue {
       .finally(() => {
         this.loading = false;
       });
-  }
-
-  private async getEvent(eventId: string): Promise<SlideEvent> {
-    // First, try to get it from the room
-    const ev = await getMatrixEvent(this.room.roomId, eventId);
-    return ev as SlideEvent;
   }
 }
 </script>

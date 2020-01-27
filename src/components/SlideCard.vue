@@ -7,7 +7,6 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import { getClient } from "@/util/matrix";
 import { Room } from 'matrix-js-sdk';
 import { UsersIcon } from 'vue-feather-icons'
 
@@ -17,7 +16,7 @@ import { UsersIcon } from 'vue-feather-icons'
     }
 })
 export default class SlideCard extends Vue {
-    @Prop() private room: Room;
+    @Prop() private room!: Room;
     private memberCount = 0;
 
     private beforeMount() {

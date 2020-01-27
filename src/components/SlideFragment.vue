@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { Room } from "matrix-js-sdk";
+import { Room, MatrixEvent } from "matrix-js-sdk";
 import hljs from "highlight.js";
 import "highlight.js/styles/github.css";
 
@@ -17,22 +17,22 @@ import "highlight.js/styles/github.css";
 export default class SlideFragment extends Vue {
     @Prop() private eventId!: string;
     @Prop() private room!: Room;
-    @Prop() private event!: any;
+    @Prop() private event!: Promise<MatrixEvent>;
 
     private image: string|null = null;
     private text: string|null = null;
     private textHtml: string|null = null;
 
     public async beforeMount() {
-        const eventData = await this.event;
-        if (eventData.content.msgtype === "m.image") {
-            this.image = this.room._client.mxcUrlToHttp(eventData.content.url);
+        const content = (await this.event).getContent();
+        if (content.msgtype === "m.image") {
+            this.image = this.room._client.mxcUrlToHttp(content.url);
         }
-        if (eventData.content.formatted_body) {
-            this.textHtml = eventData.content.formatted_body;
+        if (content.formatted_body) {
+            this.textHtml = content.formatted_body;
         }
-        if (eventData.content.body) {
-            this.text = eventData.content.body;
+        if (content.body) {
+            this.text = content.body;
         }
     }
 

@@ -94,8 +94,9 @@ export default class App extends Vue {
   private async onSync(state: string, prevState: string) {
       console.log(`Sync ${prevState}->${state}`);
       if (state === "SYNCING" && !this.ready) {
+          const userId = this.$root.$data.sharedState.userId;
           const client = getClient();
-          const profile = await client.getProfileInfo(this.$root.$data.sharedState.userId);
+          const profile = await client.getProfileInfo(userId);
           this.$root.$data.sharedState.displayName = profile && profile.displayname ? profile.displayname : userId;
           this.ready = true;
       }

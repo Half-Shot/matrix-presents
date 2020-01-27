@@ -2,7 +2,7 @@ import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import Home from "../pages/Home.vue";
 import store from "../util/store";
-import { getClient, logoutClient } from "../util/matrix";
+import { logoutClient } from "../util/matrix";
 Vue.use(VueRouter);
 
 const routes: RouteConfig[] = [

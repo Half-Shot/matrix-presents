@@ -18,6 +18,7 @@ import { Component, Vue } from "vue-property-decorator";
 })
 export default class Sync extends Vue {
     private slow = false;
+    private timer?: number;
 
     get name() {
         if (this.$root.$data.sharedState.isGuest) {
@@ -31,14 +32,14 @@ export default class Sync extends Vue {
         if (this.$root.$data.sharedState.isGuest) {
             return; // Do not show logout for guests.
         }
-        setInterval(() => {
+        this.timer = setInterval(() => {
             this.slow = true;
         }, 5000);
     }
 
     private beforeDestroy() {
-        if (this._timer) {
-            clearInterval(this._timer);
+        if (this.timer) {
+            clearInterval(this.timer);
         }
     }
 };
