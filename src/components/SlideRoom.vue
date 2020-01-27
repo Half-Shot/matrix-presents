@@ -42,21 +42,7 @@ export default class SlideRoom extends Vue {
       this.error = "The required state for this room was not found";
       return;
     }
-    const content = t.getContent();
-    this.slideEvents = content.slides;
-    if (this.slideEvents === undefined || this.slideEvents.length === 0) {
-      this.error = "No slides have been created";
-      return;
-    }
-
-    // Try to get the eventId from the query parameters
-    if (this.$route.params.eventId) {
-      this.slideEventIndex = this.slideEvents.indexOf(this.$route.params.eventId);
-    }
-
-    if (this.slideEventIndex === -1) {
-      this.slideEventIndex = 0;
-    }
+    this.updateSlideSet(t);
 
     this.room._client.on("event", this.onEvent);
 
@@ -144,20 +130,40 @@ export default class SlideRoom extends Vue {
   }
 
   private onEvent(event: any) {
-    if (this.mode !== "viewer") {
-      return;
-    }
     if (event.event.room_id !== this.room.roomId) {
       return;
     }
-    if (event.event.type !== PositionEventType || event.event.state_key === undefined) {
+    if (event.event.type === PositionEventType && event.event.state_key === undefined) {
+      if (this.mode !== "viewer") {
+        return;
+      }
+      console.log("New position from presenter", event.event.content.event_id);
+      this.updateEvent();
+      this.slideEventIndex = this.slideEvents.indexOf(event.event.content.event_id);
+      if (this.slideEventIndex === -1) {
+        console.error(`Could not find ${event.event.content.event_id} in show`);
+      }
+    }
+    if (event.event.type === SlidesEventType && event.event.state_key === "") {
+      return this.updateSlideSet(event.event);
+    }
+  }
+  
+  private updateSlideSet(t: any) {
+    const content = t.getContent();
+    this.slideEvents = content.slides;
+    if (this.slideEvents === undefined || this.slideEvents.length === 0) {
+      this.error = "No slides have been created";
       return;
     }
-    console.log("New position from presenter", event.event.content.event_id);
-    this.updateEvent();
-    this.slideEventIndex = this.slideEvents.indexOf(event.event.content.event_id);
+
+    // Try to get the eventId from the query parameters
+    if (this.$route.params.eventId) {
+      this.slideEventIndex = this.slideEvents.indexOf(this.$route.params.eventId);
+    }
+
     if (this.slideEventIndex === -1) {
-      console.error(`Could not find ${event.event.content.event_id} in show`);
+      this.slideEventIndex = 0;
     }
   }
 

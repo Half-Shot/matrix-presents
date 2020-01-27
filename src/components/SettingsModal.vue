@@ -4,10 +4,10 @@
             <div class="nav">
                 <ul> <!-- Options -->
                     <li :class="`button ${activeClass(0)}`">
-                        <a href="#">General</a>
+                        <a @click="tabIndex = 0" href="#">General</a>
                     </li>
                     <li :class="`button ${activeClass(1)}`">
-                        <a href="#">Keymappings</a>
+                        <a @click="tabIndex = 1" href="#">Keymappings</a>
                     </li>
                 </ul>
             </div>
