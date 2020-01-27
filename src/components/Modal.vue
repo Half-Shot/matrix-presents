@@ -39,6 +39,7 @@
     width: 100%;
     height: 100%;
     background: rgba($color: #000000, $alpha: 0.80);
+    z-index: 10;
 }
 
 .inner {

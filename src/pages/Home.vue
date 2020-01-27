@@ -6,7 +6,7 @@
         <SlideList :filterOwn="true"/>
         <ul class="button-set">
             <li>
-                <ActionButton disabled="true" :click="() => showCreateModal = true">
+                <ActionButton to="/slides-create">
                   <EditIcon size="1x"/>
                   Create Slideshow
                 </ActionButton>
@@ -27,7 +27,6 @@
       </section>
     </div>
     <SubscribeModal v-if="showSubscribeModal" id="sub-modal" :closeFn="() => showSubscribeModal = false"/>
-    <SubscribeModal v-if="showCreateModal" id="create-modal" :closeFn="() => showCreateModal = false"/>
   </div>
 </template>
 
@@ -83,7 +82,6 @@ import Vue from "vue";
 })
 export default class Slides extends Vue {
   private showSubscribeModal = false;
-  private showCreateModal = false;
 
   private beforeMount(): void {
     this.$root.$data.sharedState.pageName = "Home";

@@ -1,5 +1,5 @@
 <template>
-    <button :disabled="disabled" @click="click">
+    <button :disabled="disabled" @click="onClick">
         <slot/>
     </button>
 </template>
@@ -11,7 +11,17 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 })
 export default class SlideCard extends Vue {
     @Prop() private disabled!: boolean;
-    @Prop() private click!: VoidFunction;
+    @Prop() private click?: VoidFunction;
+    @Prop() private to?: string;
+
+    private onClick() {
+        if (this.click) {
+            this.click();
+        }
+        if (this.to) {
+            this.$router.push(this.to);
+        }
+    }
 }
 </script>
 

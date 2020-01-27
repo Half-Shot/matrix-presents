@@ -44,6 +44,11 @@ const routes: RouteConfig[] = [
     },
   },
   {
+    path: "/slides-create",
+    name: "slides-create",
+    component: () => import("../pages/CreateSlideshow.vue"),
+  },
+  {
     path: "/slides/:roomId/:eventId?",
     name: "slides",
     component: () => import("../pages/Slides.vue"),

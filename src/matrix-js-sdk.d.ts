@@ -59,6 +59,13 @@ declare module "matrix-js-sdk" {
         public registerGuest(): Promise<any>;
         public startClient(): void;
         public setGuest(isGuest: boolean): void;
+        public createRoom(options: {
+            room_alias_name?: string,
+            visibility?: "public"|"private",
+            invite?: string[],
+            name?: string,
+            topic?: string,
+        }): Promise<{room_id: string}>;
     }
     export class AutoDiscovery {
         public static findClientConfig(domain: string): Promise<DiscoveredClientConfig>;
