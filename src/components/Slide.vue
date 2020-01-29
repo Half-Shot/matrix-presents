@@ -12,6 +12,7 @@
       <section :class="`column ${soloClass}`" v-for="(column, index) in columns" :key="index">
         <SlideFragment
           v-for="eventId in column"
+          :isSolo="column.length === 1"
           :key="eventId"
           :eventId="eventId"
           :event="getEvent(room.roomId, eventId)"
@@ -86,10 +87,15 @@ main {
 }
 
 .column.solo {
-  margin-top: 100px;
+  margin-top: 25px;
+  height: 80vh;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
+}
+
+.column.multi {
+  flex: 1;
 }
 </style>
 
