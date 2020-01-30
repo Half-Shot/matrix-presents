@@ -86,7 +86,6 @@ main {
 }
 
 .column.solo {
-  margin-top: 100px;
   margin-left: auto;
   margin-right: auto;
   text-align: center;

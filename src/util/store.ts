@@ -8,6 +8,7 @@ interface State {
     deviceId?: string;
     pageName: string|null;
     isGuest: boolean;
+    notificationCount: number;
 }
 
 class Store {
@@ -16,6 +17,7 @@ class Store {
         userId: null,
         pageName: null,
         isGuest: false,
+        notificationCount: -1,
     };
 
     constructor() {
@@ -114,6 +116,14 @@ class Store {
 
     public get isGuest(): boolean {
         return this.state.isGuest;
+    }
+
+    public get notificationCount(): number {
+        return this.state.notificationCount;
+    }
+
+    public set notificationCount(n: number) {
+        this.state.notificationCount = n;
     }
 
     public vapeLogin(): void {

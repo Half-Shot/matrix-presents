@@ -3,7 +3,7 @@
     <div class="home-grid">
       <section>
         <h2><home-icon size="1x"></home-icon> Your Slides</h2>
-        <SlideList :filterOwn="true"/>
+        <SlideList :filterOwn="true" membership="join"/>
         <ul class="button-set">
             <li>
                 <ActionButton to="/slides-create">
@@ -14,8 +14,10 @@
         </ul>
       </section>
       <section>
+        <h2><rss-icon size="1x"></rss-icon> Invites</h2>
+        <SlideList :filterOwn="false" membership="invite"/>
         <h2><rss-icon size="1x"></rss-icon> Subscribed Slides</h2>
-        <SlideList :filterOwn="false"/>
+        <SlideList :filterOwn="false" membership="join"/>
         <ul class="button-set">
             <li>
                 <ActionButton :click="() => showSubscribeModal = true">

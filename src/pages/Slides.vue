@@ -6,7 +6,7 @@
         <p> {{error}} </p>
       </div>
     </template>
-    <SlideRoom v-if="room !== null" :room="room"/>
+    <SlideRoom v-if="room !== null && joined" :room="room"/>
     <p v-else-if="validRoomId === true">
       You are attempting to view <code>{{ $route.params.roomId }}</code>?
       <button @click="joinRoom">Join Room</button>
@@ -43,6 +43,10 @@ export default class Slides extends Vue {
   private validRoomId = true;
 
   private roomId!: string;
+
+  private get joined() {
+      return this.room?.getMyMembership() === "join";
+  }
 
   public async beforeMount() {
     this.roomId = this.$route.params.roomId;

@@ -2,6 +2,7 @@
     <div class="card">
         <router-link class="link" :to="`/slides/${encodeURIComponent(room.roomId)}`">{{ room.name }}</router-link>
         <p> <UsersIcon size="0.9x"/> {{ memberCount }} </p>
+        <p v-if="invitee"  > <UsersIcon size="0.9x"/> Invited by {{ invitee }} </p>
     </div>
 </template>
 
@@ -19,9 +20,15 @@ export default class SlideCard extends Vue {
     @Prop() private room!: Room;
     private memberCount = 0;
 
+    private invitee: string|null = null;
+
     private beforeMount() {
         const members = this.room.getMembersWithMembership("join");
         this.memberCount = members.length;
+        const ev = this.room.currentState.getStateEvents("m.room.member", this.room.myUserId);
+        if (ev.getContent().membership === "invite") {
+            this.invitee = this.room.getMember(ev.getSender()).name;
+        }
     }
 }
 

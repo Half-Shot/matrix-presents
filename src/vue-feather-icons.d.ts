@@ -5,4 +5,5 @@ declare module "vue-feather-icons" {
     export class PlusCircleIcon extends Vue { }
     export class EditIcon extends Vue { }
     export class UsersIcon extends Vue { }
+    export class BellIcon extends Vue { }
 }

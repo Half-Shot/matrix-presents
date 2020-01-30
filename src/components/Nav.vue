@@ -5,6 +5,7 @@
       </div>
       <div id="links">
         <template v-if=!isGuest>
+          <BellIcon/> 0 | 
           Logged in as {{ displayName }} |
           <router-link to="/">My Slides</router-link> |
           <a href="#" @click="showSettings">Settings</a> |
@@ -53,12 +54,19 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import { BellIcon } from "vue-feather-icons";
 
-@Component
+@Component({
+  components: { BellIcon }
+})
 export default class Login extends Vue {
     @Prop() public showSettings!: () => void;
 
-    public get isGuest() {
+    public get notificationCount() {
+        return this.$root.$data.sharedState.notificationCount;
+    }
+
+    public get isGuest() {  
         return this.$root.$data.sharedState.isGuest;
     }
 

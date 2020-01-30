@@ -21,7 +21,7 @@ declare module "matrix-js-sdk" {
     export class MatrixEvent {
         constructor(evData: unknown);
         getId(): string;
-        getSender(): RoomMember;
+        getSender(): string;
         getType(): string;
         getRoomId(): string;
         getTs(): number;
@@ -137,13 +137,15 @@ declare module "matrix-js-sdk" {
 
     export class RoomMember {
         public readonly rawDisplayName: string;
+        public readonly name: string;
         public getAvatarUrl(baseUrl: string, width: number, height: number, resizeMethod: "crop"|"scale"): string;
     }
 
     export class RoomState {
         maySendEvent(eventType: string, userId: string): boolean;
         maySendStateEvent(eventType: string, userId: string): boolean;
-        getStateEvents(eventType: string, stateKey: string): MatrixEvent | MatrixEvent[];
+        getStateEvents(eventType: string): MatrixEvent[];
+        getStateEvents(eventType: string, stateKey: string): MatrixEvent;
     }
 
     export class Room {
@@ -156,5 +158,6 @@ declare module "matrix-js-sdk" {
         public getLiveTimeline(): any;
         public getMember(userId: string): RoomMember;
         public getMembersWithMembership(membership: string): RoomMember[];
+        public getMyMembership(): string;
     }
 }

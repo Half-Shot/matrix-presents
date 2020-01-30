@@ -7,8 +7,11 @@
         <p v-if="hasNoRooms && filterOwn">
             You have not created any slides yet.
         </p>
-        <p v-else-if="hasNoRooms && !filterOwn ">
+        <p v-else-if="hasNoRooms && !filterOwn && membership === 'join'">
             You are not currently subscribed to any Slides.
+        </p>
+        <p v-else-if="hasNoRooms && membership === 'invite'">
+            You are not currently invited to any Slides.
         </p>
     </ul>
   </div>
@@ -29,6 +32,8 @@ const STATE_KEY = "uk.half-shot.presents.slides";
 })
 export default class SlideList extends Vue {
     @Prop() private filterOwn!: boolean;
+    @Prop() private membership!: string;
+
     private rooms: Room[] = [];
 
     private get hasNoRooms() {
@@ -45,18 +50,24 @@ export default class SlideList extends Vue {
 
     private regenerateRoomList() {
         const client = getClient();
-        this.rooms = [];
         client.getRooms().forEach((room) => {
+            if (room.getMyMembership() !== this.membership) {
+                return;
+            }
+            if (this.membership === "invite") {
+                this.rooms.push(room);
+                return;
+            }
             const state = room.getLiveTimeline().getState("f");
             const t = state.getStateEvents(STATE_KEY, "");
             if (!t) {
                 return;
             }
-            console.log(t.getContent());
             const isOwnSlide = t.sender === client.getUserId();
-            if (isOwnSlide && this.filterOwn || !isOwnSlide && !this.filterOwn) {
-                this.rooms.push(room);
+            if (isOwnSlide !== this.filterOwn) {
+                return;
             }
+            this.rooms.push(room);
         });
         console.log("Finished generating room list");
     }
