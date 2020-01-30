@@ -8025,6 +8025,14 @@ uuid@^3.0.1, uuid@^3.3.2:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.3.tgz#4568f0216e78760ee1dbf3a4d2cf53e224112866"
   integrity sha512-pW0No1RGHgzlpHJO1nsVrHKpOEIxkGg1xB+v0ZmdNH5OAeAwzAVrCnI2/6Mtx+Uys6iaylxa+D3g4j63IKKjSQ==
 
+v-emoji-picker@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/v-emoji-picker/-/v-emoji-picker-2.0.3.tgz#78480df8ad9503c8bfd729a60652d6e6a95c1f67"
+  integrity sha512-YJVV1IDRfbNz/Dpl/5QDCa9vcGxyT8cFUxz/ywEXGbmCGUTh1wKfFK1ueDtD1oYFjpvWhVi0PuZ/JiH+heIRlQ==
+  dependencies:
+    vue-class-component "^7.1.0"
+    vue-property-decorator "^8.3.0"
+
 v8-compile-cache@^2.0.3:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/v8-compile-cache/-/v8-compile-cache-2.1.0.tgz#e14de37b31a6d194f5690d67efc4e7f6fc6ab30e"

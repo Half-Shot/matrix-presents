@@ -50,7 +50,30 @@ export function createGlobalClient() {
         userId: Store.userId || undefined,
         deviceId: Store.deviceId,
         store,
+        unstableClientRelationAggregation: true,
+        timelineSupport: true,
     });
+
+    // XXX: Super naughty aggregations api.
+    matrixClient._mpAggregations = async function (roomId: string, eventId: string) {
+        return this._http.authedRequest(
+            undefined,
+            "GET",
+            `/rooms/${encodeURIComponent(roomId)}/aggregations/${encodeURIComponent(eventId)}/m.annotation/m.reaction`,
+            undefined,
+            undefined,
+            { prefix: "/_matrix/client/unstable" },
+        );
+    };
+    matrixClient._mpRelation = async function (roomId: string, eventId: string, emoji: string) {
+        return this._http.authedRequest(
+            undefined,
+            "POST",
+            `/rooms/${encodeURIComponent(roomId)}/send_relation/${encodeURIComponent(eventId)}/m.annotation/m.reaction?key=${emoji}`,
+            undefined,
+            {},
+        );
+    };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window as any).mxClient = matrixClient;

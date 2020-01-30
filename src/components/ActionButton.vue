@@ -9,7 +9,7 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 
 @Component({
 })
-export default class SlideCard extends Vue {
+export default class ActionButton extends Vue {
     @Prop() private disabled!: boolean;
     @Prop() private click?: VoidFunction;
     @Prop() private to?: string;

@@ -7,6 +7,8 @@ declare module "matrix-js-sdk" {
         userId?: string,
         deviceId?: string,
         store?: IndexedDBStore,
+        unstableClientRelationAggregation?: boolean,
+        timelineSupport?: boolean,
     }): MatrixClient;
 
     export interface LoginData {
@@ -53,6 +55,7 @@ declare module "matrix-js-sdk" {
         public getSyncState(): string|null;
         public getHomeserverUrl(): string;
         public mxcUrlToHttp(url: string): string;
+        public sendEvent(roomId: string, eventType: string, content: any): Promise<string>;
         public sendStateEvent(roomId: string, eventType: string, content: any, stateKey: string|""): Promise<string>;
         public getUserId(): string;
         public fetchRoomEvent(roomId: string, eventId: string): Promise<MatrixEvent>;

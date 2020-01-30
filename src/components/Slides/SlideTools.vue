@@ -5,7 +5,8 @@
         <strong v-if="canEdit" @click="toggleEditor">
             Editor {{ mode === "editor" ? "On" : "Off"}} |
         </strong>
-        <a @click="onChangeFullscreen">{{ isFullscreen ? "Exit" : "Go"  }} Fullscreen</a>
+        <a @click="onChangeFullscreen">{{ isFullscreen ? "Exit" : "Go"  }} Fullscreen</a> |
+        <ReactionButton :room="room" :slideEventId="slideEventId"></ReactionButton>
     </div>
 </template>
 
@@ -17,9 +18,12 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { Room } from 'matrix-js-sdk';
 import { PositionEventType } from "../../models/PositionEvent";
+import ReactionButton from "./ReactionButton.vue";
 
 @Component({
-
+    components: {
+        ReactionButton,
+    }
 })
 export default class SlideTools extends Vue {
     @Prop() private slideIndex!: number;
@@ -28,6 +32,7 @@ export default class SlideTools extends Vue {
     @Prop() private internalMode!: string;
     @Prop() private canEdit!: boolean;
     @Prop() private room!: Room;
+    @Prop() private slideEventId!: string;
     @Prop() private onChangeMode!: (mode: string) => void;
     @Prop() private onChangeFullscreen!: () => void;
 
@@ -73,10 +78,6 @@ export default class SlideTools extends Vue {
         } else {
             this.mode = "viewer";
         }
-    }
-
-    private toggleFullscreen() {
-
     }
 }
 </script>

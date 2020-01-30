@@ -1,5 +1,5 @@
 <template>
-  <div class="slide-wrapper" ref="slide" >
+  <div class="slide-wrapper" ref="slide">
     <SlideTools
       v-if=!isFullscreen
       :room=room
@@ -10,6 +10,7 @@
       :canEdit="false"
       :onChangeMode="(m) => mode = m"
       :onChangeFullscreen="goFullscreen"
+      :slideEventId="slideEventId"
     />
     <strong v-if="error">{{ error }}. This room cannot be viewed.</strong>
     <div class="inner-wrapper" v-else>
@@ -17,10 +18,19 @@
       <Slide v-if="!animating" :editing="mode === 'editor'" :eventId="slideEventId" :key="slideEventId" :room="room"/>
       <Slide :class="newSlideClass" v-if="animating" :eventId="slideEventId" :room="room"/>
     </div>
+    <ul class="emojitron">
+      <li v-for="(count, emoji) in currentEmojiSet" :key="emoji" :grossForceChange="forceChange"> 
+        {{ forceChange }}
+        <div v-emoji >
+          {{ emoji }}
+          <span>{{ count }}</span>
+        </div>
+      </li>
+    </ul>
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .inner-wrapper {
   position: relative;
 }
@@ -33,6 +43,34 @@
   animation-duration: 0.75s;
   width: 100%;
 }
+
+.emojitron {
+  text-align: right;
+  display: block;
+  width: 25vw;
+  height: 5vh;
+  position: absolute;
+  bottom: 5vh;
+  right: 5vh;
+
+  .emoji {
+      height: 36pt;
+  }
+
+  span {
+    display: inline-block;
+    position: absolute;
+    bottom: 0px;
+    right: 5px;
+    color: red;
+    font-weight: 800;
+    font-size: 18pt;
+  }
+
+  > li > div {
+    position: relative;
+  }
+}
 </style>
 
 <script lang="ts">
@@ -43,6 +81,7 @@ import { SlidesEventType } from "../models/SlidesEvent";
 import { PositionEventType } from "../models/PositionEvent";
 import Slide from "./Slide.vue";
 import SlideTools from "./Slides/SlideTools.vue";
+import ReactionButton from "./Slides/ReactionButton.vue";
 import { getMatrixEvent } from '../util/matrix';
 import "../../node_modules/animate.css/animate.css"
 
@@ -50,6 +89,7 @@ import "../../node_modules/animate.css/animate.css"
   components: {
     Slide,
     SlideTools,
+    ReactionButton,
   }
 })
 export default class SlideRoom extends Vue {
@@ -58,9 +98,21 @@ export default class SlideRoom extends Vue {
   private slideEvents: string[] = [];
   private error: string|null = null;
   private mode: "presenter"|"viewer"|"unlocked"|"editor" = "viewer";
+  private emojiSet: {[roomId: string]: string[]} = { };
+  private currentEmojiSet: any = {};
+  private forceChange: number = 0;
   @Prop() private room!: Room;
 
   private isFullscreen = false;
+
+  private get slideEmojis() {
+    const allEmojis = this.emojiSet[this.slideEventId] || []; 
+    const map = {};
+    allEmojis.forEach((e) => {
+      map[e] = (map[e] || 0) + 1;
+    });
+    return map;
+  }
 
   private get oldSlideClass() {
     if (this.animating === "forwards") {
@@ -101,10 +153,18 @@ export default class SlideRoom extends Vue {
 
     window.addEventListener("keydown", this.onKeyPress.bind(this));
     window.addEventListener("fullscreenchange", () => this.isFullscreen = !this.isFullscreen);
-
+    
+    this.updateEvent();
+    
     this.bufferSlides().then(() => {
       console.log("Finished buffering slides");
-    })
+    });
+  }
+
+  private beforeUnmount() {
+      this.room._client.removeEventListener("event");
+      window.removeEventListener("keydown");
+      window.removeEventListener("fullscreenchange");
   }
 
   private advanceSlide() {
@@ -188,6 +248,24 @@ export default class SlideRoom extends Vue {
   }
 
   private onEvent(event: MatrixEvent) {
+  
+    if (event.getType() === "m.reaction") {
+      // Possibly a reaction.
+      const content = event.getContent()["m.relates_to"];
+      if (content && content.rel_type === "m.annotation" && content.key && content.key.length <= 2) { //XXX: Lazy emoji detection
+        if (!this.emojiSet[this.slideEventId]) {
+          this.emojiSet[this.slideEventId] = [];
+        }
+        this.emojiSet[this.slideEventId].push(content.key);
+        this.currentEmojiSet = this.slideEmojis;
+        console.log("Got a reaction of:", content.key);
+        // HACK FILTER ROOM
+        this.currentEmojiSet[content.key] = (this.currentEmojiSet[content.key] || 0) + 1;
+        console.log("Setting current emoji");
+        this.forceChange++;
+      } 
+    }
+
     if (event.getRoomId() !== this.room.roomId) {
       return;
     }
@@ -235,11 +313,25 @@ export default class SlideRoom extends Vue {
     await (this.$refs.slide as Element).requestFullscreen();
   }
 
-  private beforeUnmount() {
-    window.removeEventListener("keypress", this.onKeyPress);
-  }
-
   private updateEvent() {
+    console.log("Update event:", this.slideEventId);
+    this.currentEmojiSet = this.slideEmojis;
+    
+    if (!this.emojiSet[this.room.roomId]) {
+      this.room._client._mpAggregations(this.room.roomId, this.slideEventId, "m.annotation", "m.reaction").then(({ chunk }) => {
+        const set = [];
+        chunk.forEach((eSet) => {
+          for (let index = 0; index < eSet.count; index++) {
+            set.push(eSet.key);
+          }
+        });
+        this.emojiSet[this.slideEventId] = set;
+        console.log("Weee:", this.emojiSet[this.slideEventId]);
+      }).catch((ex) => {
+        console.log("Could not get reactions:", ex);
+      });
+    }
+
     this.$router.push(`/slides/${this.room.roomId}/${this.slideEventId}`);
   }
 
