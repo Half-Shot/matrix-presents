@@ -5,8 +5,8 @@
         <strong v-if="canEdit" @click="toggleEditor">
             Editor {{ mode === "editor" ? "On" : "Off"}} |
         </strong>
-        <a @click="onChangeFullscreen">{{ isFullscreen ? "Exit" : "Go"  }} Fullscreen</a> |
-        <ReactionButton :room="room" :slideEventId="slideEventId"></ReactionButton>
+        <a @click="onChangeFullscreen">{{ isFullscreen ? "Exit" : "Go"  }} Fullscreen</a>
+        <!-- | <ReactionButton :room="room" :slideEventId="slideEventId"></ReactionButton> -->
     </div>
 </template>
 

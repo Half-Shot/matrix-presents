@@ -19,8 +19,7 @@
       <Slide :class="newSlideClass" v-if="animating" :eventId="slideEventId" :room="room"/>
     </div>
     <ul class="emojitron">
-      <li v-for="(count, emoji) in currentEmojiSet" :key="emoji" :grossForceChange="forceChange"> 
-        {{ forceChange }}
+      <li v-for="(count, emoji) in currentEmojiSet" :key="emoji"> 
         <div v-emoji >
           {{ emoji }}
           <span>{{ count }}</span>
@@ -100,7 +99,6 @@ export default class SlideRoom extends Vue {
   private mode: "presenter"|"viewer"|"unlocked"|"editor" = "viewer";
   private emojiSet: {[roomId: string]: string[]} = { };
   private currentEmojiSet: any = {};
-  private forceChange: number = 0;
   @Prop() private room!: Room;
 
   private isFullscreen = false;
@@ -167,7 +165,7 @@ export default class SlideRoom extends Vue {
       window.removeEventListener("fullscreenchange");
   }
 
-  private advanceSlide() {
+  private async advanceSlide() {
     if (this.mode === "viewer") {
       return;
     }
@@ -175,26 +173,16 @@ export default class SlideRoom extends Vue {
       return; // Cannot advance
     }
     this.slideEventIndex += 1;
-    this.updateEvent();
     console.log(`Advancing slide to ${this.slideEventIndex} ${this.slideEventId}`);
     this.animating = "forwards";
     setTimeout(() => {
       this.animating = null;
       this.updateEvent();
     }, 750);
-
-    if (this.mode === "presenter") {
-      this.room._client.sendStateEvent(
-        this.room.roomId, "uk.half-shot.presents.position",
-        {
-          event_id: this.slideEventId,
-        },
-        this.room._client.getUserId(),
-      );
-    }
+    await this.sendUpdatedPosition();
   }
 
-  private previousSlide() {
+  private async previousSlide() {
     if (this.mode === "viewer") {
       return;
     }
@@ -209,15 +197,23 @@ export default class SlideRoom extends Vue {
       this.animating = null;
       this.updateEvent();
     }, 750);
+    await this.sendUpdatedPosition();
+  }
 
+  private async sendUpdatedPosition() {
     if (this.mode === "presenter") {
-      this.room._client.sendStateEvent(
-        this.room.roomId, PositionEventType,
-        {
-          event_id: this.slideEventId,
-        },
-        this.room._client.getUserId(),
-      );
+      try {
+        const ev = await this.room._client.sendStateEvent(
+          this.room.roomId, "uk.half-shot.presents.position",
+          {
+            event_id: this.slideEventId,
+          },
+          this.room._client.getUserId(),
+        );
+        console.log(ev);
+      } catch (ex) {
+        console.error("Failed to change position", ex);
+      }
     }
   }
 
@@ -234,12 +230,12 @@ export default class SlideRoom extends Vue {
     return this.slideEventId;
   }
 
-  private onKeyPress(ev: KeyboardEvent) {
+  private async onKeyPress(ev: KeyboardEvent) {
     ev.preventDefault();
     if (ev.keyCode === 39) { // Right
-      this.advanceSlide();
+      await this.advanceSlide();
     } else if (ev.keyCode === 37) { // Left
-      this.previousSlide();
+      await this.previousSlide();
     }
   }
 
@@ -259,10 +255,10 @@ export default class SlideRoom extends Vue {
         this.emojiSet[this.slideEventId].push(content.key);
         this.currentEmojiSet = this.slideEmojis;
         console.log("Got a reaction of:", content.key);
+    
         // HACK FILTER ROOM
         this.currentEmojiSet[content.key] = (this.currentEmojiSet[content.key] || 0) + 1;
         console.log("Setting current emoji");
-        this.forceChange++;
       } 
     }
 
