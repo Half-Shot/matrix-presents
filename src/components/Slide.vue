@@ -8,7 +8,7 @@
         <img :src="authorAvatar" title="avatar" />
       </h3>
     </header>
-    <main>
+    <main :style="slideCustomCSS">
       <section :class="`column ${soloClass}`" v-for="(column, index) in columns" :key="index">
         <SlideFragment
           v-for="eventId in column"
@@ -74,6 +74,7 @@ main {
   display: flex;
   width: 90%;
   margin-left: 5%;
+  margin-top: 10%;
   height: 100%;
 }
 
@@ -87,7 +88,6 @@ main {
 }
 
 .column.solo {
-  margin-top: 25px;
   height: 80vh;
   margin-left: auto;
   margin-right: auto;
@@ -124,6 +124,10 @@ export default class Slide extends Vue {
 
   private get isPong() {
     return this.slideEv?.getContent().pong === true;
+  }
+
+  private get slideCustomCSS() {
+    return this.slideEv?.getContent().css || "";
   }
 
   private get headerClass() {

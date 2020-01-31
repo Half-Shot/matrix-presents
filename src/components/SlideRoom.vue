@@ -13,19 +13,22 @@
       :slideEventId="slideEventId"
     />
     <strong v-if="error">{{ error }}. This room cannot be viewed.</strong>
-    <div class="inner-wrapper" v-else>
-      <Slide :class="oldSlideClass" v-if="animating" :eventId="oldSlideEventId" :room="room"/>
-      <Slide v-if="!animating" :editing="mode === 'editor'" :eventId="slideEventId" :key="slideEventId" :room="room"/>
-      <Slide :class="newSlideClass" v-if="animating" :eventId="slideEventId" :room="room"/>
-    </div>
-    <ul class="emojitron">
-      <li v-for="(count, emoji) in currentEmojiSet" :key="emoji"> 
-        <div v-emoji >
-          {{ emoji }}
-          <span>{{ count }}</span>
-        </div>
-      </li>
-    </ul>
+    <template v-else>
+      <img v-if="qrCodeDataUrl" :src="qrCodeDataUrl" class="qrCode"/>
+      <div class="inner-wrapper">
+        <Slide :class="oldSlideClass" v-if="animating" :eventId="oldSlideEventId" :room="room"/>
+        <Slide v-if="!animating" :editing="mode === 'editor'" :eventId="slideEventId" :key="slideEventId" :room="room"/>
+        <Slide :class="newSlideClass" v-if="animating" :eventId="slideEventId" :room="room"/>
+      </div>
+      <ul class="emojitron">
+        <li v-for="(count, emoji) in currentEmojiSet" :key="emoji"> 
+          <div v-emoji >
+            {{ emoji }}
+            <span>{{ count }}</span>
+          </div>
+        </li>
+      </ul>
+    </template>
   </div>
 </template>
 
@@ -41,6 +44,11 @@
   left: 0;
   animation-duration: 0.75s;
   width: 100%;
+}
+
+.qrCode {
+  float: right;
+  width: 200px;
 }
 
 .emojitron {
@@ -82,6 +90,7 @@ import Slide from "./Slide.vue";
 import SlideTools from "./Slides/SlideTools.vue";
 import ReactionButton from "./Slides/ReactionButton.vue";
 import { getMatrixEvent } from '../util/matrix';
+import QRCode from "qrcode";
 import "../../node_modules/animate.css/animate.css"
 
 @Component({
@@ -102,6 +111,8 @@ export default class SlideRoom extends Vue {
   @Prop() private room!: Room;
 
   private isFullscreen = false;
+
+  private qrCodeDataUrl: string = "";
 
   private get slideEmojis() {
     const allEmojis = this.emojiSet[this.slideEventId] || []; 
@@ -232,9 +243,9 @@ export default class SlideRoom extends Vue {
 
   private async onKeyPress(ev: KeyboardEvent) {
     ev.preventDefault();
-    if (ev.keyCode === 39) { // Right
+    if (ev.keyCode === 39 || ev.keyCode === 34) { // Right
       await this.advanceSlide();
-    } else if (ev.keyCode === 37) { // Left
+    } else if (ev.keyCode === 37 || ev.keyCode === 33) { // Left
       await this.previousSlide();
     }
   }
@@ -265,7 +276,7 @@ export default class SlideRoom extends Vue {
     if (event.getRoomId() !== this.room.roomId) {
       return;
     }
-    if (event.getType() === PositionEventType && !event.isState()) {
+    if (event.getType() === PositionEventType && event.isState()) {
       if (this.mode !== "viewer") {
         return;
       }
@@ -327,8 +338,13 @@ export default class SlideRoom extends Vue {
         console.log("Could not get reactions:", ex);
       });
     }
-
-    this.$router.push(`/slides/${this.room.roomId}/${this.slideEventId}`);
+    const url = `/slides/${this.room.roomId}`;
+    QRCode.toDataURL(`https://presents.half-shot.uk${url}`).then((dataURL: string) => {
+      this.qrCodeDataUrl = dataURL;
+    }).catch((err) => {
+      console.error(`data error:`, err);
+    });
+    this.$router.push(`${url}/${this.slideEventId}`);
   }
 
   private async bufferSlides() {

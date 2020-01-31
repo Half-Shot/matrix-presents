@@ -2,7 +2,7 @@
     <div :class="`fragment ${isSolo ? 'solo' : ''}`">
         <img class="image" v-if="!!image" :src="image" :title="!text"/>
         <p v-emoji ref=html class="html" v-else-if="!!textHtml" v-html="textHtml"></p>
-        <p v-emoji class="plain" v-else-if="!!text"> {{ text }} </p>
+        <p v-emoji class="plain" v-else-if="!!text" v-html="text"> </p>
     </div>
 </template>
 
@@ -30,10 +30,11 @@ export default class SlideFragment extends Vue {
             this.image = this.room._client.mxcUrlToHttp(content.url);
         }
         if (content.formatted_body) {
-            this.textHtml = content.formatted_body;
+            this.textHtml = content["m.new_content"]?.formatted_body || content.formatted_body;
         }
         if (content.body) {
-            this.text = content.body;
+            this.text = content["m.new_content"]?.body || content.body;
+            this.text = `<p>${this.text!.replace(/\n\n/g, "</br>")}</p>`;
         }
     }
 
@@ -57,8 +58,10 @@ Vue.component("SlideFragment", SlideFragment);
     list-style-type: none;
 }
 
-.fragment.solo > p {
-    margin-top: 200px;
+.fragment ul > li::before {
+    content: "-";
+    font-size: 32pt;
+    margin-right: 50px;
 }
 
 .fragment.solo > p {
