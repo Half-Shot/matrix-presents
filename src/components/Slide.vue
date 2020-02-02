@@ -1,14 +1,14 @@
 <template>
   <div class="slide" v-if=!loading>
     <header :class="headerClass">
-      <h1 v-if="slideEv.getContent().title !== undefined" v-text="slideEv.getContent().title"></h1>
-      <h2 v-if="slideEv.getContent().subtitle !== undefined" v-text="slideEv.getContent().subtitle"></h2>
-      <h3 v-if="author !== undefined && headerClass == 'title'">
+      <h1 v-emoji v-if="slideEv.getContent().title !== undefined" v-text="slideEv.getContent().title"></h1>
+      <h2 v-emoji v-if="slideEv.getContent().subtitle !== undefined" v-text="slideEv.getContent().subtitle"></h2>
+      <h3 v-emoji v-if="author !== undefined && headerClass == 'title'">
         {{ author }}
         <img :src="authorAvatar" title="avatar" />
       </h3>
     </header>
-    <main :style="slideCustomCSS">
+    <main>
       <section :class="`column ${soloClass}`" v-for="(column, index) in columns" :key="index">
         <SlideFragment
           v-for="eventId in column"
@@ -74,7 +74,7 @@ main {
   display: flex;
   width: 90%;
   margin-left: 5%;
-  margin-top: 10%;
+  margin-top: 4%;
   height: 100%;
 }
 
@@ -95,7 +95,7 @@ main {
 }
 
 .column.multi {
-  flex: 1;
+  flex: auto;
 }
 </style>
 
@@ -127,6 +127,7 @@ export default class Slide extends Vue {
   }
 
   private get slideCustomCSS() {
+    console.log("CSS:", this.slideEv?.getContent().css);
     return this.slideEv?.getContent().css || "";
   }
 
@@ -167,6 +168,7 @@ export default class Slide extends Vue {
     getMatrixEvent(this.room.roomId, this.eventId)
       .then((ev) => {
         console.log(`Loaded event`, ev);
+        document.querySelector("#customSlideCSS").innerText = this.slideCustomCSS;
         this.slideEv = ev;
       })
       .catch((ex) => {

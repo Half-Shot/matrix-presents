@@ -58,10 +58,19 @@ Vue.component("SlideFragment", SlideFragment);
     list-style-type: none;
 }
 
+.fragment.solo ul {
+    list-style-type: none;
+    text-align: left;
+}
+
 .fragment ul > li::before {
     content: "-";
     font-size: 32pt;
     margin-right: 50px;
+}
+
+.fragment li {
+    font-size: 24pt;
 }
 
 .fragment.solo > p {

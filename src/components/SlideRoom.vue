@@ -14,25 +14,30 @@
     />
     <strong v-if="error">{{ error }}. This room cannot be viewed.</strong>
     <template v-else>
-      <img v-if="qrCodeDataUrl" :src="qrCodeDataUrl" class="qrCode"/>
+      <img v-if="qrCodeDataUrl && mode === 'presenter'" :src="qrCodeDataUrl" class="qrCode"/>
       <div class="inner-wrapper">
         <Slide :class="oldSlideClass" v-if="animating" :eventId="oldSlideEventId" :room="room"/>
         <Slide v-if="!animating" :editing="mode === 'editor'" :eventId="slideEventId" :key="slideEventId" :room="room"/>
         <Slide :class="newSlideClass" v-if="animating" :eventId="slideEventId" :room="room"/>
       </div>
-      <ul class="emojitron">
+      <!-- <ul class="emojitron">
         <li v-for="(count, emoji) in currentEmojiSet" :key="emoji"> 
           <div v-emoji >
             {{ emoji }}
             <span>{{ count }}</span>
           </div>
         </li>
-      </ul>
+      </ul> -->
     </template>
   </div>
 </template>
 
 <style lang="scss">
+
+.column.solo > .fragment.solo img {
+  max-height: 80vh;
+}
+
 .inner-wrapper {
   position: relative;
 }
@@ -256,22 +261,22 @@ export default class SlideRoom extends Vue {
 
   private onEvent(event: MatrixEvent) {
   
-    if (event.getType() === "m.reaction") {
-      // Possibly a reaction.
-      const content = event.getContent()["m.relates_to"];
-      if (content && content.rel_type === "m.annotation" && content.key && content.key.length <= 2) { //XXX: Lazy emoji detection
-        if (!this.emojiSet[this.slideEventId]) {
-          this.emojiSet[this.slideEventId] = [];
-        }
-        this.emojiSet[this.slideEventId].push(content.key);
-        this.currentEmojiSet = this.slideEmojis;
-        console.log("Got a reaction of:", content.key);
+    // if (event.getType() === "m.reaction") {
+    //   // Possibly a reaction.
+    //   const content = event.getContent()["m.relates_to"];
+    //   if (content && content.rel_type === "m.annotation" && content.key && content.key.length <= 2) { //XXX: Lazy emoji detection
+    //     if (!this.emojiSet[this.slideEventId]) {
+    //       this.emojiSet[this.slideEventId] = [];
+    //     }
+    //     this.emojiSet[this.slideEventId].push(content.key);
+    //     this.currentEmojiSet = this.slideEmojis;
+    //     console.log("Got a reaction of:", content.key);
     
-        // HACK FILTER ROOM
-        this.currentEmojiSet[content.key] = (this.currentEmojiSet[content.key] || 0) + 1;
-        console.log("Setting current emoji");
-      } 
-    }
+    //     // HACK FILTER ROOM
+    //     this.currentEmojiSet[content.key] = (this.currentEmojiSet[content.key] || 0) + 1;
+    //     console.log("Setting current emoji");
+    //   } 
+    // }
 
     if (event.getRoomId() !== this.room.roomId) {
       return;
@@ -322,22 +327,22 @@ export default class SlideRoom extends Vue {
 
   private updateEvent() {
     console.log("Update event:", this.slideEventId);
-    this.currentEmojiSet = this.slideEmojis;
+    // this.currentEmojiSet = this.slideEmojis;
     
-    if (!this.emojiSet[this.room.roomId]) {
-      this.room._client._mpAggregations(this.room.roomId, this.slideEventId, "m.annotation", "m.reaction").then(({ chunk }) => {
-        const set = [];
-        chunk.forEach((eSet) => {
-          for (let index = 0; index < eSet.count; index++) {
-            set.push(eSet.key);
-          }
-        });
-        this.emojiSet[this.slideEventId] = set;
-        console.log("Weee:", this.emojiSet[this.slideEventId]);
-      }).catch((ex) => {
-        console.log("Could not get reactions:", ex);
-      });
-    }
+    // if (!this.emojiSet[this.room.roomId]) {
+    //   this.room._client._mpAggregations(this.room.roomId, this.slideEventId, "m.annotation", "m.reaction").then(({ chunk }) => {
+    //     const set = [];
+    //     chunk.forEach((eSet) => {
+    //       for (let index = 0; index < eSet.count; index++) {
+    //         set.push(eSet.key);
+    //       }
+    //     });
+    //     this.emojiSet[this.slideEventId] = set;
+    //     console.log("Weee:", this.emojiSet[this.slideEventId]);
+    //   }).catch((ex) => {
+    //     console.log("Could not get reactions:", ex);
+    //   });
+    // }
     const url = `/slides/${this.room.roomId}`;
     QRCode.toDataURL(`https://presents.half-shot.uk${url}`).then((dataURL: string) => {
       this.qrCodeDataUrl = dataURL;
