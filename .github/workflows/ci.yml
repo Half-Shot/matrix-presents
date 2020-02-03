@@ -13,6 +13,8 @@ jobs:
         node-version: 12.x
     - name: 🧶 Install
       run: yarn install
+    - name: Copy config
+      run: cp config.sample.json config.json
     - name: 🔨 Build
       run: yarn build
   lint:
@@ -25,5 +27,5 @@ jobs:
         node-version: 12.x
     - name: 🧶 Install
       run: yarn install
-    - name: 🔨 Build
+    - name: 📇 Lint
       run: yarn lint
