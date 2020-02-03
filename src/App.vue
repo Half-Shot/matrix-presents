@@ -64,6 +64,7 @@ import { IndexedDBStore } from "matrix-js-sdk";
 import Sync from "./components/Sync.vue";
 import Nav from "./components/Nav.vue";
 import SettingsModal from "./components/SettingsModal.vue";
+import { initiate } from "./util/eventStore";
 
 @Component({
   components: {
@@ -79,6 +80,7 @@ export default class App extends Vue {
 
   private async beforeMount() {
     console.log("App mounting!");
+    initiate();
 
   }
 

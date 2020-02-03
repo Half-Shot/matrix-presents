@@ -94,7 +94,7 @@ import { PositionEventType } from "../models/PositionEvent";
 import Slide from "./Slide.vue";
 import SlideTools from "./Slides/SlideTools.vue";
 import ReactionButton from "./Slides/ReactionButton.vue";
-import { getMatrixEvent } from '../util/matrix';
+import { getMatrixEvent } from '../util/eventStore';
 import QRCode from "./QRCode.vue"
 import "../../node_modules/animate.css/animate.css"
 
@@ -114,7 +114,7 @@ export default class SlideRoom extends Vue {
   private mode: "presenter"|"viewer"|"unlocked"|"editor" = "unlocked";
   private emojiSet: {[roomId: string]: string[]} = { };
   private currentEmojiSet: any = {};
-  @Prop() private room!: Room;
+  @Prop() private room!: Room;v
 
   private isFullscreen = false;
 
@@ -351,7 +351,11 @@ export default class SlideRoom extends Vue {
       const slideEv = await getMatrixEvent(this.room.roomId, slideId);
       for (const fragmentColumn of slideEv.getContent().columns || []) {
         for (const fragmentId of fragmentColumn) {
-          await getMatrixEvent(this.room.roomId, fragmentId);
+          try {
+            await getMatrixEvent(this.room.roomId, fragmentId);
+          } catch (ex) {
+            // Carry on, carry on...
+          }
         }
       }
     }

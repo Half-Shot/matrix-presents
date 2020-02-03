@@ -102,7 +102,7 @@ main {
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { Room, MatrixEvent } from "matrix-js-sdk";
-import { getMatrixEvent } from "../util/matrix";
+import { getMatrixEvent } from "../util/eventStore";
 
 interface SlideEvent {
   type: "uk.half-shot.presents.slide";
