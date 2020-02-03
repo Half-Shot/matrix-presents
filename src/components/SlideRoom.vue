@@ -111,7 +111,7 @@ export default class SlideRoom extends Vue {
   private slideEventIndex = -1;
   private slideEvents: string[] = [];
   private error: string|null = null;
-  private mode: "presenter"|"viewer"|"unlocked"|"editor" = "viewer";
+  private mode: "presenter"|"viewer"|"unlocked"|"editor" = "unlocked";
   private emojiSet: {[roomId: string]: string[]} = { };
   private currentEmojiSet: any = {};
   @Prop() private room!: Room;
