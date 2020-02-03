@@ -169,9 +169,6 @@ export default class SlideRoom extends Vue {
     
     this.updateEvent();
     
-    this.bufferSlides().then(() => {
-      console.log("Finished buffering slides");
-    });
   }
 
   private beforeUnmount() {
@@ -325,7 +322,6 @@ export default class SlideRoom extends Vue {
   }
 
   private updateEvent() {
-    console.log("Update event:", this.slideEventId);
     // this.currentEmojiSet = this.slideEmojis;
     
     // if (!this.emojiSet[this.room.roomId]) {
@@ -342,20 +338,27 @@ export default class SlideRoom extends Vue {
     //     console.log("Could not get reactions:", ex);
     //   });
     // }
+    this.bufferSlides().then(() => {
+      console.debug("Finished buffering slides");
+    });
     this.$router.push(`/slides/${this.room.roomId}/${this.slideEventId}`);
   }
 
   private async bufferSlides() {
-    // This will pull in events for all slides in the background.
-    for (const slideId of this.slideEvents) {
-      const slideEv = await getMatrixEvent(this.room.roomId, slideId);
-      for (const fragmentColumn of slideEv.getContent().columns || []) {
-        for (const fragmentId of fragmentColumn) {
-          try {
-            await getMatrixEvent(this.room.roomId, fragmentId);
-          } catch (ex) {
-            // Carry on, carry on...
-          }
+    const nextEv = this.slideEvents[this.slideEventIndex+1];
+    console.debug(`Buffering ${nextEv}`);
+    if (!nextEv) {
+      // This is the end.
+      return;
+    }
+    // This will pull in events for the next slide in the background.
+    const slideEv = await getMatrixEvent(this.room.roomId, nextEv);
+    for (const fragmentColumn of slideEv.getContent().columns || []) {
+      for (const fragmentId of fragmentColumn) {
+        try {
+          await getMatrixEvent(this.room.roomId, fragmentId);
+        } catch (ex) {
+          // Carry on, carry on...
         }
       }
     }

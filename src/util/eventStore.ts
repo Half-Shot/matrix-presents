@@ -25,7 +25,7 @@ export async function initiate() {
 }
 
 export async function getMatrixEvent(roomId: string, eventId: string) {
-    console.log(`Fetching ${roomId} ${eventId}`);
+    console.debug(`Fetching ${roomId} ${eventId}`);
     const getPromise = new Promise((resolve, reject) => {
         if (!database) {
             throw Error("Database not initiated");
@@ -39,12 +39,11 @@ export async function getMatrixEvent(roomId: string, eventId: string) {
 
     try {
         const getResult = await getPromise;
-        console.log("Ev:", getResult);
         if (getResult) {
             return new MatrixEvent(getResult);
         }
     } catch (ex) {
-        console.log("Error couldn't get cached ev:", ex);
+        console.warn("Error couldn't get cached ev:", ex);
     }
 
     const client = getClient();
@@ -52,7 +51,7 @@ export async function getMatrixEvent(roomId: string, eventId: string) {
         roomId,
         eventId,
     ));
-    console.log(`Got non-cached event ${roomId}:${eventId}`);
+    console.debug(`Got non-cached event ${roomId}:${eventId}`);
     await new Promise((resolve, reject) => {
         if (!database) {
             throw Error("Database not initiated");

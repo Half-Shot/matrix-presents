@@ -127,7 +127,6 @@ export default class Slide extends Vue {
   }
 
   private get slideCustomCSS() {
-    console.log("CSS:", this.slideEv?.getContent().css);
     return this.slideEv?.getContent().css || "";
   }
 
@@ -164,10 +163,10 @@ export default class Slide extends Vue {
   }
 
   private beforeMount() {
-    console.log(`Loading ${this.eventId}`);
+    console.debug(`Loading ${this.eventId}`);
     getMatrixEvent(this.room.roomId, this.eventId)
       .then((ev) => {
-        console.log(`Loaded event`, ev);
+        console.debug(`Loaded event`, ev);
         document.querySelector("#customSlideCSS").innerText = this.slideCustomCSS;
         this.slideEv = ev;
       })

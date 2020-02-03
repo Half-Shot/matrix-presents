@@ -7,10 +7,13 @@
       </div>
     </template>
     <SlideRoom v-if="room !== null" :room="room"/>
-    <p v-else-if="validRoomId === true">
-      You are attempting to view <code>{{ $route.params.roomId }}</code>?
-      <button @click="joinRoom">Join Room</button>
-    </p>
+    <template v-else-if="validRoomId === true">
+      <p v-if="joining">Joining room...</p>
+      <template v-else>
+        <p>You are attempting to view <code>{{ $route.params.roomId }}</code>?</p>
+        <button @click="joinRoom">Join Room</button>
+      </template>
+    </template>
     <p v-else>
       <code>{{ $route.params.roomId }}</code> is not a valid room ID or alias.
     </p>
@@ -41,6 +44,7 @@ export default class Slides extends Vue {
   private room: Room|null = null;
   private error: string|null = null;
   private validRoomId = true;
+  private joining = false;
 
   private roomId!: string;
 
@@ -62,6 +66,7 @@ export default class Slides extends Vue {
   }
 
   private async joinRoom() {
+    this.joining = true;
     this.error = null;
     const client = getClient();
     try {
@@ -76,6 +81,8 @@ export default class Slides extends Vue {
     } catch (ex) {
       console.error("Failed to join room", ex);
       this.error = ex.message;
+    } finally {
+      this.joining = false;
     }
   }
 
