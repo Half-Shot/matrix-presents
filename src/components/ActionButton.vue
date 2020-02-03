@@ -1,5 +1,5 @@
 <template>
-    <button :disabled="disabled" @click="onClick">
+    <button :disabled="disabled" :title="title" @click="onClick">
         <slot/>
     </button>
 </template>
@@ -13,6 +13,7 @@ export default class ActionButton extends Vue {
     @Prop() private disabled!: boolean;
     @Prop() private click?: VoidFunction;
     @Prop() private to?: string;
+    @Prop() private title?: string;
 
     private onClick() {
         if (this.click) {

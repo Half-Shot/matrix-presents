@@ -1,7 +1,7 @@
 <template>
     <div class="tools">
         <strong>{{ slideIndex + 1 }} / {{ slideCount }}</strong> |
-        <strong id="modechanger" :title="MODE_TITLE[mode]" class="mode" @click="switchMode">{{ mode }}</strong> |
+        <ActionButton id="modechanger" :title="MODE_TITLE[mode]" class="mode" :click="switchMode">{{ mode }}</ActionButton> |
         <strong v-if="canEdit" @click="toggleEditor">
             Editor {{ mode === "editor" ? "On" : "Off"}} |
         </strong>
@@ -19,10 +19,12 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import { Room } from 'matrix-js-sdk';
 import { PositionEventType } from "../../models/PositionEvent";
 import ReactionButton from "./ReactionButton.vue";
+import ActionButton from "../ActionButton.vue";
 
 @Component({
     components: {
         ReactionButton,
+        ActionButton,
     }
 })
 export default class SlideTools extends Vue {

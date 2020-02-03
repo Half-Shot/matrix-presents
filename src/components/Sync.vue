@@ -34,7 +34,7 @@ export default class Sync extends Vue {
         }
         this.timer = setInterval(() => {
             this.slow = true;
-        }, 5000);
+        }, 30000);
     }
 
     private beforeDestroy() {

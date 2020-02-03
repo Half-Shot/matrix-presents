@@ -14,7 +14,7 @@
     />
     <strong v-if="error">{{ error }}. This room cannot be viewed.</strong>
     <template v-else>
-      <img v-if="qrCodeDataUrl && mode === 'presenter'" :src="qrCodeDataUrl" class="qrCode"/>
+      <QRCode v-if="mode === 'presenter'" :room="room" class="qrcode"/>
       <div class="inner-wrapper">
         <Slide :class="oldSlideClass" v-if="animating" :eventId="oldSlideEventId" :room="room"/>
         <Slide v-if="!animating" :editing="mode === 'editor'" :eventId="slideEventId" :key="slideEventId" :room="room"/>
@@ -95,7 +95,7 @@ import Slide from "./Slide.vue";
 import SlideTools from "./Slides/SlideTools.vue";
 import ReactionButton from "./Slides/ReactionButton.vue";
 import { getMatrixEvent } from '../util/matrix';
-import QRCode from "qrcode";
+import QRCode from "./QRCode.vue"
 import "../../node_modules/animate.css/animate.css"
 
 @Component({
@@ -103,6 +103,7 @@ import "../../node_modules/animate.css/animate.css"
     Slide,
     SlideTools,
     ReactionButton,
+    QRCode,
   }
 })
 export default class SlideRoom extends Vue {
@@ -116,8 +117,6 @@ export default class SlideRoom extends Vue {
   @Prop() private room!: Room;
 
   private isFullscreen = false;
-
-  private qrCodeDataUrl: string = "";
 
   private get slideEmojis() {
     const allEmojis = this.emojiSet[this.slideEventId] || []; 
@@ -343,13 +342,7 @@ export default class SlideRoom extends Vue {
     //     console.log("Could not get reactions:", ex);
     //   });
     // }
-    const url = `/slides/${this.room.roomId}`;
-    QRCode.toDataURL(`https://presents.half-shot.uk${url}`).then((dataURL: string) => {
-      this.qrCodeDataUrl = dataURL;
-    }).catch((err) => {
-      console.error(`data error:`, err);
-    });
-    this.$router.push(`${url}/${this.slideEventId}`);
+    this.$router.push(`/slides/${this.room.roomId}/${this.slideEventId}`);
   }
 
   private async bufferSlides() {

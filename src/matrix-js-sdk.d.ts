@@ -69,6 +69,7 @@ declare module "matrix-js-sdk" {
             name?: string,
             topic?: string,
         }): Promise<{room_id: string}>;
+        public getEventTimeline(): any;
     }
     export class AutoDiscovery {
         public static findClientConfig(domain: string): Promise<DiscoveredClientConfig>;
