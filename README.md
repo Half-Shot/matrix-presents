@@ -12,6 +12,9 @@ To run the project:
 git clone https://github.com/Half-Shot/matrix-presents
 cd matrix-presents
 yarn
+```
+Create `config.json` (e.g. based on `config.sample.json`) then
+```
 yarn serve
 ```
 
