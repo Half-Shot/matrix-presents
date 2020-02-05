@@ -86,7 +86,7 @@ export default class Slides extends Vue {
         }
     }
 
-    private createShow() {
+    private async createShow() {
         if (!this.formData.title) {
             this.errors.title = "This must be specified";
             // Cannot create;
@@ -94,9 +94,21 @@ export default class Slides extends Vue {
         }
         const client = getClient();
         this.creating = true;
-        client.createRoom({
-
+        const {room_id} = await client.createRoom({
+            room_alias_name: this.formData.alias,
+            topic: this.formData.subtitle,
+            name: this.formData.title,
         });
+        const { event_id } = await client.sendEvent(room_id, "uk.half-shot.presents.slide", {
+            title: this.formData.title,
+            subtitle: this.formData.subtitle,
+        });
+        const stateEv = await client.sendStateEvent(room_id, "uk.half-shot.presents.slides", {
+            slides: [event_id],
+        }, "");
+        console.log("Created new slide:", stateEv);
+        this.creating = false;
+        this.$router.push(`/editor/${room_id}`);
     }
 }
 </script>
