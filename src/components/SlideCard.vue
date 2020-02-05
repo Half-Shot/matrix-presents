@@ -1,18 +1,27 @@
 <template>
     <div class="card">
         <router-link class="link" :to="`/slides/${encodeURIComponent(room.roomId)}`">{{ room.name }}</router-link>
-        <p> <UsersIcon size="0.9x"/> {{ memberCount }} </p>
+        <p>
+            <span>
+                <UsersIcon size="0.9x"/> {{ memberCount }}
+            </span>
+            <span v-if="!isPublic">
+                <LockIcon size="0.9x"/> Private
+            </span>
+        </p>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { Room } from 'matrix-js-sdk';
-import { UsersIcon } from 'vue-feather-icons'
+import { UsersIcon, LockIcon, UnlockIcon } from 'vue-feather-icons'
 
 @Component({
     components: {
-        UsersIcon
+        UsersIcon,
+        LockIcon,
+        UnlockIcon,
     }
 })
 export default class SlideCard extends Vue {
@@ -22,6 +31,11 @@ export default class SlideCard extends Vue {
     private beforeMount() {
         const members = this.room.getMembersWithMembership("join");
         this.memberCount = members.length;
+    }
+
+    private get isPublic() {
+        const event = this.room.getLiveTimeline().getState("f").getStateEvents("m.room.join_rules")[0];
+        return event.getContent().join_rule === "public";
     }
 }
 
