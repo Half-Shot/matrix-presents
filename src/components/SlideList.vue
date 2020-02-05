@@ -7,7 +7,7 @@
         <p v-if="hasNoRooms && filterOwn">
             You have not created any slides yet.
         </p>
-        <p v-else-if="hasNoRooms && !filterOwn ">
+        <p v-else-if="hasNoRooms && !filterOwn">
             You are not currently subscribed to any Slides.
         </p>
     </ul>
@@ -52,8 +52,7 @@ export default class SlideList extends Vue {
             if (!t) {
                 return;
             }
-            console.log(t.getContent());
-            const isOwnSlide = t.sender === client.getUserId();
+            const isOwnSlide = t.getSender() === client.getUserId();
             if (isOwnSlide && this.filterOwn || !isOwnSlide && !this.filterOwn) {
                 this.rooms.push(room);
             }
