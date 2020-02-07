@@ -50,7 +50,7 @@
 }
 
 .emojitron {
-  width: 25vw;
+  width: 75vw;
   height: 5vh;
   position: absolute;
   bottom: 5vh;
