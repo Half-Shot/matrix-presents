@@ -52,20 +52,22 @@ export async function getMatrixEvent(roomId: string, eventId: string) {
         eventId,
     ));
     console.debug(`Got non-cached event ${roomId}:${eventId}`);
-    await new Promise((resolve, reject) => {
-        if (!database) {
-            throw Error("Database not initiated");
-        }
-        const txn = database.transaction("event-cache", "readwrite");
-        const store = txn.objectStore("event-cache");
-        const dataReq = store.put({
-            eventId,
-            roomId,
-            data: ev.event,
+    if (database) {
+        await new Promise((resolve, reject) => {
+            if (!database) {
+                throw Error("Database not initiated");
+            }
+            const txn = database.transaction("event-cache", "readwrite");
+            const store = txn.objectStore("event-cache");
+            const dataReq = store.put({
+                eventId,
+                roomId,
+                data: ev.event,
+            });
+            dataReq.onsuccess = function(unusedEv) { resolve(dataReq.result); };
+            dataReq.onerror = function(unusedEv) { reject(dataReq.error); };
         });
-        dataReq.onsuccess = function(unusedEv) { resolve(dataReq.result); };
-        dataReq.onerror = function(unusedEv) { reject(dataReq.error); };
-    });
+    }
 
     return ev;
 }
