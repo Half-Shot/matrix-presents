@@ -21,6 +21,7 @@ declare module "matrix-js-sdk" {
     }
 
     export class MatrixEvent {
+        event: any;
         constructor(evData: unknown);
         getId(): string;
         getSender(): RoomMember;

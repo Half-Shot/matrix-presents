@@ -46,10 +46,6 @@ export default class SlideFragment extends Vue {
         }
     }
 }
-
-console.log("Registered");
-
-Vue.component("SlideFragment", SlideFragment);
 </script>
 
 <style lang="scss">

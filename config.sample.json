@@ -1,3 +1,4 @@
 {
-    "guest_homeserver": "https://reckless.half-shot.uk"
+    "guest_homeserver": "https://reckless.half-shot.uk",
+    "base_uri": "https://presents.half-shot.uk"
 }

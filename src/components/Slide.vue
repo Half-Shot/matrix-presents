@@ -103,6 +103,7 @@ main {
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { Room, MatrixEvent } from "matrix-js-sdk";
 import { getMatrixEvent } from "../util/eventStore";
+import SlideFragment from "./SlideFragment.vue";
 
 interface SlideEvent {
   type: "uk.half-shot.presents.slide";
@@ -115,7 +116,11 @@ interface SlideEvent {
   };
 }
 
-@Component
+@Component({
+  components: {
+    SlideFragment,
+  }
+})
 export default class Slide extends Vue {
   @Prop() private room!: Room;
   @Prop() private eventId!: string;

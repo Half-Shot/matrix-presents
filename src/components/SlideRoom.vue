@@ -14,10 +14,10 @@
     />
     <strong v-if="error">{{ error }}. This room cannot be viewed.</strong>
     <template v-else>
-      <QRCode v-if="mode === 'presenter'" :room="room" class="qrcode"/>
+      <QRCode :room="room" class="qrCode"/>
       <div class="inner-wrapper">
         <Slide :class="oldSlideClass" v-if="animating" :eventId="oldSlideEventId" :room="room"/>
-        <Slide v-if="!animating" :editing="mode === 'editor'" :eventId="slideEventId" :key="slideEventId" :room="room"/>
+        <Slide v-if="!animating" :eventId="slideEventId" :key="slideEventId" :room="room"/>
         <Slide :class="newSlideClass" v-if="animating" :eventId="slideEventId" :room="room"/>
       </div>
       <!-- <ul class="emojitron">
@@ -53,7 +53,7 @@
 
 .qrCode {
   float: right;
-  width: 200px;
+  width: 400px;
 }
 
 .emojitron {
@@ -114,7 +114,7 @@ export default class SlideRoom extends Vue {
   private mode: "presenter"|"viewer"|"unlocked"|"editor" = "unlocked";
   private emojiSet: {[roomId: string]: string[]} = { };
   private currentEmojiSet: any = {};
-  @Prop() private room!: Room;v
+  @Prop() private room!: Room;
 
   private isFullscreen = false;
 
