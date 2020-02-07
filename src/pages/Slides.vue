@@ -6,7 +6,10 @@
         <p> {{error}} </p>
       </div>
     </template>
-    <SlideRoom v-if="room !== null" :room="room"/>
+    <template v-if="room !== null" >
+      <SlideRoomEditor v-if="editor" :room="room"/>
+      <SlideRoom v-else :room="room"/>
+    </template>
     <template v-else-if="validRoomId === true">
       <p v-if="joining">Joining room...</p>
       <template v-else>
@@ -24,13 +27,14 @@
 // @ is an alias to /src
 import SlideFragment from "@/components/SlideFragment.vue";
 import SlideRoom from "@/components/SlideRoom.vue";
+import SlideRoomEditor from "@/components/Editor/SlideRoomEditor.vue";
 import Slide from "@/components/Slide.vue";
 import TableTennis from "@/components/TableTennis.vue";
 
 import { getClient } from "../util/matrix";
 import { Room } from "matrix-js-sdk";
 import Component from "vue-class-component";
-import Vue from "vue";
+import { Vue, Prop } from "vue-property-decorator";
 
 @Component({
   components: {
@@ -38,9 +42,12 @@ import Vue from "vue";
     Slide,
     SlideFragment,
     TableTennis,
+    SlideRoomEditor,
   },
 })
+
 export default class Slides extends Vue {
+  @Prop() private editor!: boolean;
   private room: Room|null = null;
   private error: string|null = null;
   private validRoomId = true;

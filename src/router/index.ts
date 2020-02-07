@@ -51,11 +51,17 @@ const routes: RouteConfig[] = [
   {
     path: "/slides/:roomId/:eventId?",
     name: "slides",
+    props: {
+      editor: false,
+    },
     component: () => import("../pages/Slides.vue"),
   },
   {
     path: "/editor/:roomId/:eventId?",
     name: "slides-editor",
+    props: {
+      editor: true,
+    },
     component: () => import("../pages/Slides.vue"),
   },
 ];

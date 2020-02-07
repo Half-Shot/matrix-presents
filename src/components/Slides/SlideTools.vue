@@ -1,12 +1,12 @@
 <template>
     <div class="tools">
         <strong>{{ slideIndex + 1 }} / {{ slideCount }}</strong> |
-        <ActionButton id="modechanger" :title="MODE_TITLE[mode]" class="mode" :click="switchMode">{{ mode }}</ActionButton> |
+        <ActionButton :title="MODE_TITLE[mode]" class="mode" :click="switchMode">{{ mode }}</ActionButton> |
         <strong v-if="canEdit" @click="toggleEditor">
             Editor {{ mode === "editor" ? "On" : "Off"}} |
         </strong>
-        <a @click="onChangeFullscreen">{{ isFullscreen ? "Exit" : "Go"  }} Fullscreen</a>
-        <!-- | <ReactionButton :room="room" :slideEventId="slideEventId"></ReactionButton> -->
+        <ActionButton :title="MODE_TITLE[mode]" class="mode" :click="onChangeFullscreen">{{ isFullscreen ? "Exit" : "Go"  }} Fullscreen</ActionButton> |
+        <ReactionButton :room="room" :slideEventId="slideEventId"></ReactionButton>
     </div>
 </template>
 
