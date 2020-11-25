@@ -11,7 +11,7 @@
   "dependencies": {
     "animate.css": "^3.7.2",
     "core-js": "^3.4.4",
-    "highlight.js": "^9.17.1",
+    "highlight.js": "^10.1.2",
     "matrix-js-sdk": "^3.0.0",
     "qrcode": "^1.4.4",
     "twemoji": "^12.1.5",
