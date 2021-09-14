@@ -12,7 +12,7 @@
     "animate.css": "^3.7.2",
     "core-js": "^3.4.4",
     "highlight.js": "^9.17.1",
-    "matrix-js-sdk": "^3.0.0",
+    "matrix-js-sdk": "^12.4.1",
     "qrcode": "^1.4.4",
     "twemoji": "^12.1.5",
     "v-emoji-picker": "^2.0.3",
